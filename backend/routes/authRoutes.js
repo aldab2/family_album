@@ -10,15 +10,16 @@ import {authUser,
     deleteUser,
     logoutUser
 }  from '../controllers/authController.js';
+import { protect } from '../middleware/authMidleware.js';
 
 const router = express.Router();
 
 router.post('/',authUser);
 router.post('/family',registerFamily);
-router.get('/family',getFamilyProfile);
-router.put('/family',editFamilyProfile);
-router.delete('/family',deleteFamilyProfile);
-router.route('/user').post(createUser).get(getUserProfile).put(editUser).delete(deleteUser)
+router.get('/family',protect,getFamilyProfile);
+router.put('/family',protect,editFamilyProfile);
+router.delete('/family',protect,deleteFamilyProfile);
+router.route('/user').post(createUser).get(protect,getUserProfile).put(protect,editUser).delete(protect,deleteUser)
 router.post('/logout',logoutUser);
 
 
