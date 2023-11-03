@@ -2,6 +2,8 @@ import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
 import Family from '../models/familyModel.js'
 import generateToken from '../utils/generateToken.js';
+import { FamilyCreateDTO, FamilyReadDTO } from '../DTOs/FamilyDTOs.js';
+import { UserReadDTO } from '../DTOs/UserDTOs.js';
 
 /**
  * @desc Auth user/set token
@@ -14,18 +16,7 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ userName });
   if (user && (await user.matchPassword(password))) {
     generateToken(res, user._id);
-    res.status(200).json({
-      
-          _id: user._id,
-          firstName:user.firstName,
-          lastName:user.lastName,
-          email:user.email,
-          userName:user.userName,
-          family: user.family,
-          role:user.role
-        
-      
-    });
+    res.status(200).json(new UserReadDTO(user));
   }
   else {
     res.status(401);
@@ -41,24 +32,21 @@ const authUser = asyncHandler(async (req, res) => {
 * @access Public
 *  @type {import("express").RequestHandler} */
 const registerFamily = asyncHandler(async (req, res) => {
-  const { firstName, lastName, familyName, userName, email, password } = req.body;
+  const familyCreateDTO = new FamilyCreateDTO(req.body);
 
-  const userExists = await User.findOne({ userName: userName });
+  const userExists = await User.findOne({ userName: familyCreateDTO.userName });
   if (userExists) {
     res.status(400);
     throw new Error('User already exsits');
   }
 
   const user = await User.create({
-    firstName: firstName,
-    lastName: lastName,
-    userName: userName,
-    password: password,
-    email: email,
-    role:"parent"
-  })
+   ...familyCreateDTO,
+   role:'parent',
+   active:true
+  }) 
   const family = await Family.create({
-    familyName: familyName,
+    spaceName: familyCreateDTO.spaceName,
     familyMembers: [user._id]
   })
 
@@ -66,28 +54,14 @@ const registerFamily = asyncHandler(async (req, res) => {
 
   if (user) {
     generateToken(res, user._id);
-    res.status(201).json({
-      _id: family._id,
-      familyName,
-      familyMembers: [
-        {
-          _id: user._id,
-          firstName,
-          lastName,
-          email,
-          userName,
-          role:user.role
-        }
-      ]
-    });
+    family.familyMembers = [user];
+    const familyReadDto = new FamilyReadDTO(family);
+    res.status(201).json(familyReadDto);
   }
   else {
     res.status(400);
     throw new Error("Invalid User Data");
   }
-
-
-  //res.status(200).send({message : "Register Family"})
 });
 
 

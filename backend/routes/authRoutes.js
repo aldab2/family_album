@@ -19,7 +19,7 @@ router.post('/family',registerFamily);
 router.get('/family',protect,getFamilyProfile);
 router.put('/family',protect,editFamilyProfile);
 router.delete('/family',protect,deleteFamilyProfile);
-router.route('/user').post(createUser).get(protect,getUserProfile).put(protect,editUser).delete(protect,deleteUser)
+router.route('/user').post(protect,createUser).get(protect,getUserProfile).put(protect,editUser).delete(protect,deleteUser)
 router.post('/logout',logoutUser);
 
 

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const familySchema = mongoose.Schema({
-    familyName:{
+    spaceName:{
         type: String,
         required: true
     },
@@ -15,5 +15,13 @@ const familySchema = mongoose.Schema({
 });
 
 const Family = mongoose.model('Family',familySchema);
+
+
+
+
+
+  
+
+  
 
 export default Family;

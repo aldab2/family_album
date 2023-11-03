@@ -23,6 +23,19 @@ const userSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    gender:{
+        type: String,
+        enum: ['male', 'female'],
+        required: true
+    },
+    dateOfBirth:{
+        type: Date,
+        required: true
+    },
+    active:{
+        type: String,
+        required: true
+    },
     password:{
         type: String,
         required: true
@@ -54,4 +67,11 @@ userSchema.methods.matchPassword = async function(enteredPassword){
 }
 const User = mongoose.model('User',userSchema);
 
-export default User;
+
+
+
+
+
+
+
+export  default User;
