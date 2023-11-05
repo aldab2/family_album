@@ -4,6 +4,7 @@ import Family from '../models/familyModel.js'
 import generateToken from '../utils/generateToken.js';
 import { FamilyCreateDTO, FamilyReadDTO } from '../DTOs/FamilyDTOs.js';
 import { UserCreateDTO, UserReadDTO } from '../DTOs/UserDTOs.js';
+import { sendActivationEmail } from '../utils/emailUtils.js';
 
 /**
  * @desc Auth user/set token
@@ -41,10 +42,10 @@ const registerFamily = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({
-   ...familyCreateDTO,
-   role:'parent',
-   active:true
-  }) 
+    ...familyCreateDTO,
+    role: 'parent',
+    active: true
+  })
   const family = await Family.create({
     spaceName: familyCreateDTO.spaceName,
     familyMembers: [user._id]
@@ -72,7 +73,7 @@ const registerFamily = asyncHandler(async (req, res) => {
 *  @type {import("express").RequestHandler} */
 const getFamilyProfile = asyncHandler(async (req, res) => {
   const familyId = req.user.family;
-  const familyReadDto = new FamilyReadDTO(await  Family.findOne({_id:familyId}).populate('familyMembers'));
+  const familyReadDto = new FamilyReadDTO(await Family.findOne({ _id: familyId }).populate('familyMembers'));
   res.status(200).json(familyReadDto);
 });
 
@@ -103,35 +104,67 @@ const deleteFamilyProfile = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const addFamilyMember = asyncHandler(async (req, res) => {
-  const userCreateDto = new UserCreateDTO(req.body);
 
-  const userExists = await User.findOne({ userName: userCreateDto.userName });
-  if (userExists) {
-    res.status(400);
-    throw new Error('User already exsits');
+  try {
+    const userCreateDto = new UserCreateDTO(req.body);
+
+  
+    // If the created user is a parent, validate that there is only 1 parent
+   // Check if the user is set to be a parent and validate the number of parents
+   if (userCreateDto.role === 'parent') {
+    const parentsCount = await User.countDocuments({ 
+      family: req.user.family, 
+      role: 'parent' 
+    });
+
+    if (parentsCount >= 2) {
+      res.status(400)
+      throw new Error('A family cannot have more than two parents.' );
+    }
   }
 
-  const isActive = userCreateDto.role === "child" || !userCreateDto.email
-  const user = await User.create({
-   ...userCreateDto,
-   active:isActive,
-   family:req.user.family
-  }) 
- 
-  await Family.updateOne({ _id: user.family }, { $set: { family: family._id } });
 
-  if (user) {
-    generateToken(res, user._id);
-    family.familyMembers = [user];
-    const familyReadDto = new FamilyReadDTO(family);
-    res.status(201).json(familyReadDto);
+    // User is active if its a child or the user's email is not provided.
+    const isActive = userCreateDto.role === "child" || !userCreateDto.email
+    const user = await User.create({
+      ...userCreateDto,
+      active: isActive,
+      family: req.user.family
+    })
+
+
+    if (user) {
+      await Family.updateOne({ _id: req.user.family }, { $addToSet: { familyMembers: user._id } });
+
+      if (!isActive) {
+        await sendActivationEmail(user);
+      }
+
+      // Populate the family members and format the response with the FamilyReadDTO
+      const family = await Family.findOne({ _id: req.user.family }).populate('familyMembers');
+      const updatedFamilyDTO = new FamilyReadDTO(family);
+      res.status(201).json(updatedFamilyDTO);
+    }
+    else {
+      res.status(400);
+      throw new Error("Invalid User Data");
+    }
+  } catch (error) {
+    if (error.code === 11000) {
+      // Attempt to parse the error message
+      const field = Object.keys(error.keyPattern)[0]; // The field name
+      const value = error.keyValue[field]; // The value that caused the duplicate key error
+      const message = `${field.charAt(0).toUpperCase() + field.slice(1)} '${value}' is already used`;
+      res.status(400);
+      console.log(JSON.stringify(error.keyValue))
+      throw new Error(message)
+    } else {
+
+      console.error(error); // Log the error for debugging purposes.
+      throw new Error(error)
+    }
   }
-  else {
-    res.status(400);
-    throw new Error("Invalid User Data");
 
-
-  res.status(200).send({ message: "Create User" })
 });
 
 /**
@@ -140,7 +173,7 @@ const addFamilyMember = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getUserProfile = asyncHandler(async (req, res) => {
-  res.status(200).send( req.user);
+  res.status(200).send(req.user);
 });
 
 
@@ -170,7 +203,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 * @access Public
 *  @type {import("express").RequestHandler} */
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie('jwt','',{
+  res.cookie('jwt', '', {
     httpOnly: true,
     expires: new Date(0)
   })
@@ -187,7 +220,7 @@ export {
   editFamilyProfile,
   deleteFamilyProfile,
   addFamilyMember
-,
+  ,
   getUserProfile,
   editUser,
   deleteUser,

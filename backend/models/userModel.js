@@ -17,11 +17,15 @@ const userSchema = mongoose.Schema({
     },
     email:{
         type: String,
-        required: false
+        required: false,
+        unique: true,
+        sparse: true // This allows multiple documents with null values
     },
     mobile:{
         type: String,
-        required: false
+        required: false,
+        unique: true,
+        sparse: true // This allows multiple documents with null values
     },
     gender:{
         type: String,
