@@ -221,21 +221,6 @@ const changePassword = asyncHandler(async (req, res) => {
   //get the user to use save and matchPasword functions (not in the DTO)
   const user = await User.findById(req.user.id);
 
-  /* // Check if the current password is correct
-  if (!(await user.matchPassword(currentPassword))) {
-      throw new Error("Current password is incorrect.");
-    }
-  // Check if the new password is different from the current password
-  if(currentPassword === newPassword ){
-    res.status(400);
-    throw new Error("New password must be different than old password");
-  }
-
-  
-  user.password = newPassword
-  // Save the user to hash the new password and trigger the `pre('save')` middleware
-  await user.save(); */
-
   await changePasswordAndSave(res,currentPassword,newPassword,user);
   
   // Logout the user by clearing the JWT token cookie
