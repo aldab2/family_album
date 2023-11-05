@@ -3,7 +3,7 @@ import User from '../models/userModel.js'
 import Family from '../models/familyModel.js'
 import generateToken from '../utils/generateToken.js';
 import { FamilyCreateDTO, FamilyReadDTO } from '../DTOs/FamilyDTOs.js';
-import { UserReadDTO } from '../DTOs/UserDTOs.js';
+import { UserCreateDTO, UserReadDTO } from '../DTOs/UserDTOs.js';
 
 /**
  * @desc Auth user/set token
@@ -71,7 +71,9 @@ const registerFamily = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getFamilyProfile = asyncHandler(async (req, res) => {
-  res.status(200).send({ message: "Logout User" })
+  const familyId = req.user.family;
+  const familyReadDto = new FamilyReadDTO(await  Family.findOne({_id:familyId}).populate('familyMembers'));
+  res.status(200).json(familyReadDto);
 });
 
 /**
@@ -100,7 +102,35 @@ const deleteFamilyProfile = asyncHandler(async (req, res) => {
 * @route POST /api/auth/user
 * @access Private
 *  @type {import("express").RequestHandler} */
-const createUser = asyncHandler(async (req, res) => {
+const addFamilyMember = asyncHandler(async (req, res) => {
+  const userCreateDto = new UserCreateDTO(req.body);
+
+  const userExists = await User.findOne({ userName: userCreateDto.userName });
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exsits');
+  }
+
+  const isActive = userCreateDto.role === "child" || !userCreateDto.email
+  const user = await User.create({
+   ...userCreateDto,
+   active:isActive,
+   family:req.user.family
+  }) 
+ 
+  await Family.updateOne({ _id: user.family }, { $set: { family: family._id } });
+
+  if (user) {
+    generateToken(res, user._id);
+    family.familyMembers = [user];
+    const familyReadDto = new FamilyReadDTO(family);
+    res.status(201).json(familyReadDto);
+  }
+  else {
+    res.status(400);
+    throw new Error("Invalid User Data");
+
+
   res.status(200).send({ message: "Create User" })
 });
 
@@ -156,7 +186,8 @@ export {
   getFamilyProfile,
   editFamilyProfile,
   deleteFamilyProfile,
-  createUser,
+  addFamilyMember
+,
   getUserProfile,
   editUser,
   deleteUser,
