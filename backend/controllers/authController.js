@@ -220,6 +220,10 @@ const changePassword = asyncHandler(async (req, res) => {
 
   //get the user to use save and matchPasword functions (not in the DTO)
   const user = await User.findById(req.user.id);
+  // if user was not active, activate the user since the password was changed
+  if(!user.active){
+    user.active = true;
+  }
 
   await changePasswordAndSave(res,currentPassword,newPassword,user);
   
