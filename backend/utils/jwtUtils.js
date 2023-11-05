@@ -14,4 +14,13 @@ const generateToken = (res,userId)=>{
     })
 }
 
-export default generateToken;
+
+/**@param {import('express').Response} res  */
+const releaseToken = (res)=>{
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        expires: new Date(0)
+      })
+} 
+
+export  { generateToken, releaseToken};
