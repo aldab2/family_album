@@ -30,14 +30,27 @@ class UserUpdateDTO {
       this.mobile = user.mobile;
       this.gender = user.gender;
       this.dateOfBirth = user.dateOfBirth;
-      this.active = user.active
       // Exclude password from the DTO
       this.role = user.role;
-      // Depending on how you want to handle references, you might want to populate this
-      this.family = user.family;
     }
   }
 
+class UserCreateDTO {
+    constructor(user) {
+      this.firstName = user.firstName;
+      this.lastName = user.lastName;
+      this.userName = user.userName;
+      this.email = user.email;
+      this.mobile = user.mobile;
+      this.gender = user.gender;
+      this.dateOfBirth = user.dateOfBirth;
+      this.password = user.password;
+      // Exclude password from the DTO
+      this.role = user.role;
+    }
+
+}
+
   
 
-  export  {UserReadDTO , UserUpdateDTO};
+  export  {UserReadDTO, UserCreateDTO , UserUpdateDTO};
