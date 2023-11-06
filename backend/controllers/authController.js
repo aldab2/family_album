@@ -12,7 +12,7 @@ import changePasswordAndSave from '../utils/authUtils.js';
  * @route POST /api/auth/authUser
  * @access Public
  *  @type {import("express").RequestHandler} */
-const authUser = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { userName, password } = req.body;
 
   const user = await User.findOne({ userName });
@@ -183,7 +183,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
  * @route PUT /api/auth/user
  * @access Private
  *  @type {import("express").RequestHandler} */
-const editUser = asyncHandler(async (req, res) => {
+const editFamilyMember = asyncHandler(async (req, res) => {
   res.status(200).send({ message: "Edit User" })
 });
 
@@ -192,9 +192,34 @@ const editUser = asyncHandler(async (req, res) => {
  * @desc Delete user
  * @route DELETE /api/auth/user
  * @access Private
- *  @type {import("express").RequestHandler} */
-const deleteUser = asyncHandler(async (req, res) => {
-  res.status(200).send({ message: "Delete User" })
+ * @type {import("express").RequestHandler} */
+const deleteFamilyMember = asyncHandler(async (req, res) => {
+  const {userName} = req.body;
+
+  const user = await User.findOne({userName});
+  if(user){
+    if(user.userName === userName){
+      res.status(400);
+      throw new Error("Cannot delete your account");
+    }
+    if(user.role === 'parent'){
+      res.status(400);
+      throw new Error("Cannot delete another parent");
+    }
+
+    const family = await Family.findOneAndUpdate({ _id: req.user.family }, { $pull: { familyMembers: user._id } },
+      { new: true } // Ensure you get the updated family document
+      ).populate('familyMembers');
+    const familyReadDTO = new FamilyReadDTO(family);
+    await User.deleteOne({userName});
+
+    res.status(200).json(familyReadDTO)
+
+  }
+  else {
+    throw new Error(`User ${userName} not found`);
+  }
+
 });
 
 
@@ -233,21 +258,16 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 
-
-
-
-
 export {
-  authUser,
+  login,
   registerFamily,
   getFamilyProfile,
   editFamilyProfile,
   deleteFamilyProfile,
-  addFamilyMember
-  ,
+  addFamilyMember,
   getUserProfile,
-  editUser,
-  deleteUser,
+  editFamilyMember,
+  deleteFamilyMember,
   logoutUser,
   changePassword
 };
