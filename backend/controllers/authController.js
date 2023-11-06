@@ -196,12 +196,14 @@ const editFamilyMember = asyncHandler(async (req, res) => {
 const deleteFamilyMember = asyncHandler(async (req, res) => {
   const {userName} = req.body;
 
+  if(req.user.userName === userName){
+    res.status(400);
+    throw new Error("Cannot delete your account");
+  }
+
   const user = await User.findOne({userName});
   if(user){
-    if(user.userName === userName){
-      res.status(400);
-      throw new Error("Cannot delete your account");
-    }
+    
     if(user.role === 'parent'){
       res.status(400);
       throw new Error("Cannot delete another parent");
@@ -213,7 +215,7 @@ const deleteFamilyMember = asyncHandler(async (req, res) => {
     const familyReadDTO = new FamilyReadDTO(family);
     await User.deleteOne({userName});
 
-    res.status(200).json(familyReadDTO)
+    res.status(204).json(familyReadDTO)
 
   }
   else {
