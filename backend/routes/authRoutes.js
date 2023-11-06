@@ -8,7 +8,8 @@ import {authUser,
     editUser,
     deleteUser,
     logoutUser,
-    addFamilyMember
+    addFamilyMember,
+    changePassword
 }  from '../controllers/authController.js';
 import { protect } from '../middleware/authMidleware.js';
 
@@ -20,6 +21,7 @@ router.get('/family',protect,getFamilyProfile);
 router.put('/family',protect,editFamilyProfile);
 router.delete('/family',protect,deleteFamilyProfile);
 router.route('/user').post(protect,addFamilyMember).get(protect,getUserProfile).put(protect,editUser).delete(protect,deleteUser)
+router.put('/change-password',protect,changePassword)
 router.post('/logout',logoutUser);
 
 

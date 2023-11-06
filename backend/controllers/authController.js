@@ -1,10 +1,11 @@
 import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
 import Family from '../models/familyModel.js'
-import generateToken from '../utils/generateToken.js';
+import {generateToken , releaseToken} from '../utils/jwtUtils.js';
 import { FamilyCreateDTO, FamilyReadDTO } from '../DTOs/FamilyDTOs.js';
 import { UserCreateDTO, UserReadDTO } from '../DTOs/UserDTOs.js';
 import { sendActivationEmail } from '../utils/emailUtils.js';
+import changePasswordAndSave from '../utils/authUtils.js';
 
 /**
  * @desc Auth user/set token
@@ -203,12 +204,35 @@ const deleteUser = asyncHandler(async (req, res) => {
 * @access Public
 *  @type {import("express").RequestHandler} */
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie('jwt', '', {
-    httpOnly: true,
-    expires: new Date(0)
-  })
-  res.status(200).send({ message: "User logged out" })
+  releaseToken(res);
+  res.status(200).send({ message: "User logged out" });
 });
+
+
+/**
+* @desc Change Password
+* @route PUT /api/auth/change-password
+* @access Private
+*  @type {import("express").RequestHandler} */
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  // change password
+
+  //get the user to use save and matchPasword functions (not in the DTO)
+  const user = await User.findById(req.user.id);
+  // if user was not active, activate the user since the password was changed
+  if(!user.active){
+    user.active = true;
+  }
+
+  await changePasswordAndSave(res,currentPassword,newPassword,user);
+  
+  // Logout the user by clearing the JWT token cookie
+  releaseToken(res)
+  res.status(200).send({ message: "Password changed." })
+});
+
+
 
 
 
@@ -224,5 +248,6 @@ export {
   getUserProfile,
   editUser,
   deleteUser,
-  logoutUser
+  logoutUser,
+  changePassword
 };
