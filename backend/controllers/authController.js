@@ -196,7 +196,7 @@ const editFamilyMember = asyncHandler(async (req, res) => {
 const deleteFamilyMember = asyncHandler(async (req, res) => {
   const {userName} = req.body;
 
-  const user = await User.findOne({userName});
+  const user = await User.findOne({ userName: userName, family: req.user.family });
   if(user){
     if(user.userName === userName){
       res.status(400);
@@ -217,7 +217,8 @@ const deleteFamilyMember = asyncHandler(async (req, res) => {
 
   }
   else {
-    throw new Error(`User ${userName} not found`);
+    res.status(400);
+    throw new Error(`User ${userName} was not found in your family`);
   }
 
 });
