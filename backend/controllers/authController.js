@@ -1,9 +1,9 @@
 import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
 import Family from '../models/familyModel.js'
-import {generateToken , releaseToken} from '../utils/jwtUtils.js';
+import { generateToken, releaseToken } from '../utils/jwtUtils.js';
 import { FamilyCreateDTO, FamilyReadDTO } from '../DTOs/FamilyDTOs.js';
-import { UserCreateDTO, UserReadDTO } from '../DTOs/UserDTOs.js';
+import { UserCreateDTO, UserReadDTO, UserUpdateDTO } from '../DTOs/UserDTOs.js';
 import { sendActivationEmail } from '../utils/emailUtils.js';
 import changePasswordAndSave from '../utils/authUtils.js';
 
@@ -109,20 +109,20 @@ const addFamilyMember = asyncHandler(async (req, res) => {
   try {
     const userCreateDto = new UserCreateDTO(req.body);
 
-  
-    // If the created user is a parent, validate that there is only 1 parent
-   // Check if the user is set to be a parent and validate the number of parents
-   if (userCreateDto.role === 'parent') {
-    const parentsCount = await User.countDocuments({ 
-      family: req.user.family, 
-      role: 'parent' 
-    });
 
-    if (parentsCount >= 2) {
-      res.status(400)
-      throw new Error('A family cannot have more than two parents.' );
+    // If the created user is a parent, validate that there is only 1 parent
+    // Check if the user is set to be a parent and validate the number of parents
+    if (userCreateDto.role === 'parent') {
+      const parentsCount = await User.countDocuments({
+        family: req.user.family,
+        role: 'parent'
+      });
+
+      if (parentsCount >= 2) {
+        res.status(400)
+        throw new Error('A family cannot have more than two parents.');
+      }
     }
-  }
 
 
     // User is active if its a child or the user's email is not provided.
@@ -184,7 +184,66 @@ const getUserProfile = asyncHandler(async (req, res) => {
  * @access Private
  *  @type {import("express").RequestHandler} */
 const editFamilyMember = asyncHandler(async (req, res) => {
-  res.status(200).send({ message: "Edit User" })
+  const userUpdateDTO = new UserUpdateDTO(req.body);
+
+  const user = await User.findOne({ userName: userUpdateDTO.currentUserName, family: req.user.family });
+  if (user) {
+
+    // if the role was provided and the user is initially a perent throw error because parent role cannot be changed
+    if (user.role === 'parent' && userUpdateDTO.role) {
+      res.status(400);
+      throw new Error(`parent role cannot be changed`);
+    }
+    // child and adult roles cannot be changed to parent role
+    if ((user.role === 'child' || user.role === 'adult') && userUpdateDTO.role === 'parent') {
+      res.status(400);
+      throw new Error(`childs and adults cannot become parents`);
+    }
+
+    // if the password was provided and it is diffirent from the current password change is and change the user active status
+    if (userUpdateDTO.password) {
+      const passwordMatches = await user.matchPassword(userUpdateDTO.password);
+      if (!passwordMatches) {
+        user.password = userUpdateDTO.password;
+        // The user is active if it is a child role or it does not have an email, else its inactive
+        user.active = user.role === "child" || !user.email || userUpdateDTO.role === "child" || !userUpdateDTO.email
+        if (user.active === false) {
+          await sendActivationEmail(user);
+        }
+
+      }
+      else {
+        res.status(403)
+        throw new Error(`provided password cannot be the same as current password `);
+     
+      }
+
+    }
+    
+
+    // remove the passowrd from the DTO
+    delete userUpdateDTO.password;
+
+    //update the user 
+    Object.assign(user, userUpdateDTO);
+
+    //save the user
+    await user.save();
+
+
+    const userReadDTO = new UserReadDTO(user);
+    res.status(200).json(userReadDTO);
+
+
+
+
+  }
+  else {
+    res.status(404);
+    throw new Error(`User ${userUpdateDTO.currentUserName} was not found in your family`);
+  }
+
+
 });
 
 
@@ -194,26 +253,28 @@ const editFamilyMember = asyncHandler(async (req, res) => {
  * @access Private
  * @type {import("express").RequestHandler} */
 const deleteFamilyMember = asyncHandler(async (req, res) => {
-  const {userName} = req.body;
+  const { userName } = req.body;
 
-  const user = await User.findOne({userName});
-  if(user){
-    if(user.userName === userName){
-      res.status(400);
-      throw new Error("Cannot delete your account");
-    }
-    if(user.role === 'parent'){
+  if (req.user.userName === userName) {
+    res.status(400);
+    throw new Error("Cannot delete your account");
+  }
+
+  const user = await User.findOne({ userName });
+  if (user) {
+
+    if (user.role === 'parent') {
       res.status(400);
       throw new Error("Cannot delete another parent");
     }
 
     const family = await Family.findOneAndUpdate({ _id: req.user.family }, { $pull: { familyMembers: user._id } },
       { new: true } // Ensure you get the updated family document
-      ).populate('familyMembers');
+    ).populate('familyMembers');
     const familyReadDTO = new FamilyReadDTO(family);
-    await User.deleteOne({userName});
+    await User.deleteOne({ userName });
 
-    res.status(200).json(familyReadDTO)
+    res.status(204).json(familyReadDTO)
 
   }
   else {
@@ -246,12 +307,12 @@ const changePassword = asyncHandler(async (req, res) => {
   //get the user to use save and matchPasword functions (not in the DTO)
   const user = await User.findById(req.user.id);
   // if user was not active, activate the user since the password was changed
-  if(!user.active){
+  if (!user.active) {
     user.active = true;
   }
 
-  await changePasswordAndSave(res,currentPassword,newPassword,user);
-  
+  await changePasswordAndSave(res, currentPassword, newPassword, user);
+
   // Logout the user by clearing the JWT token cookie
   releaseToken(res)
   res.status(200).send({ message: "Password changed." })
