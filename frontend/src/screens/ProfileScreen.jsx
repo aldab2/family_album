@@ -6,7 +6,8 @@ import { useLogoutMutation } from '../slices/usersApiSlice';
 import {clearCredentials} from '../slices/authSlice'
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
-import { useGetFamilyMembersQuery, useGetUserInfoQuery } from '../slices/profileApiSlice';
+import { useGetFamilyMembersQuery, useGetUserInfoQuery,useDeleteUserMutation } from '../slices/profileApiSlice';
+import {toast}  from 'react-toastify'
 
 
 const ProfileScreen = () => {
@@ -19,8 +20,9 @@ const ProfileScreen = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const {data:fetchedUser,isLoading:isGetUserLoading} = useGetUserInfoQuery();
-    const {data:fetchedFamilyMember, isLoading:isgetFamilyMembersLoading}  = useGetFamilyMembersQuery();
+    const {data:fetchedUser,isLoading:isGetUserLoading,} = useGetUserInfoQuery();
+    const  {data:fetchedFamilyMember, isLoading:isgetFamilyMembersLoading, refetch:refetchFamily}  = useGetFamilyMembersQuery();
+    const [deleteUser, {isLoading:isDeleteUserLoading}] = useDeleteUserMutation();
 
     useEffect(()=>{
         if(fetchedUser){
@@ -33,6 +35,18 @@ const ProfileScreen = () => {
         }
        
     },[fetchedUser,fetchedFamilyMember])
+
+    const handleDelete = async (userName)=>{
+        try {
+            
+            const res = await deleteUser({userName}).unwrap();
+            refetchFamily();
+        } catch (err) {
+            toast.error(err?.data?.message || err.error);
+            
+        }
+
+    }
 
     const formatDate = (dateString) => {
         if(dateString){
@@ -74,7 +88,7 @@ const ProfileScreen = () => {
             </Col>
             <Col xs={4} md={2} className="text-right">
               <Button variant="primary" size="sm" className="me-2">Edit</Button>
-              <Button variant="danger" size="sm">Delete</Button>
+              <Button variant="danger" size="sm" onClick={() => handleDelete(member.userName)}>Delete</Button>
             </Col>
           </Row>
         </ListGroup.Item>

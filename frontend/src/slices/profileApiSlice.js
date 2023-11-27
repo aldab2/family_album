@@ -18,8 +18,15 @@ export const profileApiSlice = apiSlice.injectEndpoints({
                 method: 'GET'
             })
         }),
+        deleteUser: builder.mutation({
+            query: (data)=> ({
+                url: `${USER_URL}`,
+                method: 'DELETE',
+                body:data
+            })
+        }),
         
     })
 });
 
-export const { useGetFamilyMembersQuery, useGetUserInfoQuery} = profileApiSlice;
+export const { useGetFamilyMembersQuery, useGetUserInfoQuery, useDeleteUserMutation } = profileApiSlice;
