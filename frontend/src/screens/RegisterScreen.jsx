@@ -1,7 +1,14 @@
-import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link ,useNavigate} from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
 import { Form, Button, Col, Row } from "react-bootstrap";
+import {useDispatch, useSelector} from 'react-redux'
+import { useState, useEffect } from "react";
+import {toast}  from 'react-toastify'
+import Loader from '../components/Loader'
+import { useRegisterFamilyMutation } from "../slices/usersApiSlice";
+import { setCredentials } from '../slices/authSlice';
+
+
 
 const RegisterScreen = () =>{
     const [spaceName, setSpaceName] = useState('');
@@ -14,10 +21,43 @@ const RegisterScreen = () =>{
     const [gender, setGender] = useState('');
     const [dateOfBirth, setDateOfBirth] = useState('');
 
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const {userInfo} = useSelector((state)=> state.authReducer);
+
+    const [registerFamily,{isLoading}] = useRegisterFamilyMutation();
+
+
+    useEffect(()=>{
+        if(userInfo){
+            navigate('/')
+        }
+    },[navigate,userInfo])
+
+
+
 
     const submitHandler = async(e) => {
         e.preventDefault();
-        console.log('submit');
+        
+        if(password !== passwordConfirmation){
+            toast.error("Passwords do not match");
+        
+        }
+        else {
+            try {
+                const res = await registerFamily({spaceName,firstName,lastName,userName,password,email,gender,dateOfBirth}).unwrap();
+                const user = res.familyMembers[0]
+                console.log(user);
+                dispatch(setCredentials({...user}));
+                navigate('/');
+            } catch (err) {
+
+                toast.error(err?.data?.message || err.error);
+                
+            }
+        }
         // Here you would handle the submission, e.g. sending data to the backend
     }
     
@@ -85,7 +125,7 @@ const RegisterScreen = () =>{
                     />
                 </Form.Group>
 
-                <Form.Group className='my-2' controlId='password' >
+                <Form.Group className='my-2' controlId='passwordConfirm' >
                     <Form.Label>Confirm Password</Form.Label>
                     <Form.Control 
                         type='password' 
@@ -112,6 +152,8 @@ const RegisterScreen = () =>{
                         onChange={(e) => setDateOfBirth(e.target.value)}
                     />
                 </Form.Group>
+
+                {isLoading ? <Loader></Loader> : <></>}
 
                 <Button   type='submit' variant='primary' className='justify-content-center mt-3'>
                     Create Family!

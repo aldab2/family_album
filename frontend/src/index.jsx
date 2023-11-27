@@ -10,6 +10,8 @@ import reportWebVitals from './reportWebVitals';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import PrivateRoute from './components/PrivateRoute';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -17,6 +19,14 @@ const router = createBrowserRouter(
       <Route index={true} path='/' element={<HomeScreen></HomeScreen>}></Route>
       <Route path='/login' element={<LoginScreen></LoginScreen>}></Route>
       <Route path='/register-family' element={<RegisterScreen></RegisterScreen>}></Route>
+      
+      {/* Private Routes */}
+      <Route path='' element={<PrivateRoute></PrivateRoute>}>
+      <Route path='/profile' element={<ProfileScreen></ProfileScreen>}></Route>
+
+      </Route>
+
+
 
     </Route>
     
