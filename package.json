@@ -1,0 +1,18 @@
+{
+  "name": "family_space",
+  "version": "1.0.0",
+  "description": "### Backend #### Node, ExpressJS and Mongo (found in dir /backend) First run  ```npm install``` then run ``` npm start``` to run the backend # or ```npm server``` to run with nodemon (development automatic refresh) ### Frontend React (found in dir /frontend) First run  ```npm install``` then run ``` npm start``` to run the frontend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon backend/server.js",
+    "client": "npm run start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1"
+  }
+}
