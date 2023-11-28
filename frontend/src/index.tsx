@@ -1,10 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import store from './store'
+import store from './store';
 import { Provider } from 'react-redux';
-import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from 'react-router-dom'
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from 'react-router-dom';
 import './index.css';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import HomeScreen from './screens/HomeScreen';
@@ -15,30 +20,25 @@ import PrivateRoute from './components/PrivateRoute';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={<App></App>}>
-      <Route index={true} path='/' element={<HomeScreen></HomeScreen>}></Route>
-      <Route path='/login' element={<LoginScreen></LoginScreen>}></Route>
-      <Route path='/register-family' element={<RegisterScreen></RegisterScreen>}></Route>
-      
+    <Route path="/" element={<App />}>
+      <Route index={true} path="/" element={<HomeScreen />} />
+      <Route path="/login" element={<LoginScreen />} />
+      <Route path="/register-family" element={<RegisterScreen />} />
+
       {/* Private Routes */}
-      <Route path='' element={<PrivateRoute></PrivateRoute>}>
-      <Route path='/profile' element={<ProfileScreen></ProfileScreen>}></Route>
-
+      <Route path="" element={<PrivateRoute />}>
+        <Route path="/profile" element={<ProfileScreen />} />
       </Route>
-
-
-
     </Route>
-    
   )
-)
+);
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
   <Provider store={store}>
-  <React.StrictMode>
-    <RouterProvider router={router}></RouterProvider>
-  </React.StrictMode>
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
   </Provider>
 );
 

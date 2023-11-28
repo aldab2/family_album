@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link ,useNavigate} from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
 import { Form, Button, Col, Row } from "react-bootstrap";
@@ -7,6 +8,7 @@ import {toast}  from 'react-toastify'
 import Loader from '../components/Loader'
 import { useRegisterFamilyMutation } from "../slices/usersApiSlice";
 import { setCredentials } from '../slices/authSlice';
+import { RootState } from '../store';
 
 
 
@@ -24,7 +26,7 @@ const RegisterScreen = () =>{
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const {userInfo} = useSelector((state)=> state.authReducer);
+    const {userInfo} = useSelector((state: RootState)=> state.authReducer);
 
     const [registerFamily,{isLoading}] = useRegisterFamilyMutation();
 
@@ -38,7 +40,7 @@ const RegisterScreen = () =>{
 
 
 
-    const submitHandler = async(e) => {
+    const submitHandler = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
         if(password !== passwordConfirmation){
@@ -52,7 +54,7 @@ const RegisterScreen = () =>{
                 console.log(user);
                 dispatch(setCredentials({...user}));
                 navigate('/');
-            } catch (err) {
+            } catch (err:any) {
 
                 toast.error(err?.data?.message || err.error);
                 
