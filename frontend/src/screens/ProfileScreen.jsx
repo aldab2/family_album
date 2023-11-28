@@ -63,7 +63,7 @@ const ProfileScreen = () => {
     <>
     <Row className="mb-4">
         <Col>
-          <h2>Logged In User Information</h2>
+          <h2>User Information</h2>
           <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
           <p><strong>Username:</strong> {user.userName}</p>
           <p><strong>Role:</strong> {user.role}</p>
