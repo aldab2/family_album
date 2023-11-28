@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import  authRoutes from './routes/authRoutes.js'
+import  postRoutes from './routes/postRoutes.js'
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
@@ -18,7 +19,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 
 app.use('/api/auth',authRoutes);
-
+app.use('/post',postRoutes)
 
 
 app.get('/', (req, res) => {

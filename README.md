@@ -10,3 +10,6 @@ or ```npm server``` to run with nodemon (development automatic refresh)
 First run 
 ```npm install``` then run
 ``` npm start``` to run the frontend
+
+### To run them all 
+Run ```npm install``` inside the root directory,frontend and backend (3 times), then run ``` npm run dev ``` inside the root
