@@ -1,3 +1,4 @@
+import React from 'react';
 import { Navbar, Nav, Container, NavDropdown, Badge, ListGroup, Row, Col, Button } from 'react-bootstrap';
 import { FaSignInAlt, FaSignOutAlt, FaUser, FaUserCircle } from 'react-icons/fa';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -8,20 +9,22 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { useGetFamilyMembersQuery, useGetUserInfoQuery,useDeleteUserMutation } from '../slices/profileApiSlice';
 import {toast}  from 'react-toastify'
+import { RootState } from '../store';
 
 
 const ProfileScreen = () => {
-    const [user,setUser] = useState('');
-    const [familyMembers,setFamilyMembers] = useState([]);
-    const [spaceInfo , setSpaceInfo] = useState('');
+    const [user,setUser] = useState<User| null>(null);
+    const [familyMembers,setFamilyMembers] = useState<FamilyMember[]>([]);
+    const [spaceInfo , setSpaceInfo] = useState<SpaceInfo | null>(null);
+    
 
-    const {userInfo} = useSelector((state)=> state.authReducer);
+    const {userInfo} = useSelector((state:RootState)=> state.authReducer);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const {data:fetchedUser,isLoading:isGetUserLoading,} = useGetUserInfoQuery();
-    const  {data:fetchedFamilyMember, isLoading:isgetFamilyMembersLoading, refetch:refetchFamily}  = useGetFamilyMembersQuery();
+    const {data:fetchedUser,isLoading:isGetUserLoading,} = useGetUserInfoQuery({});
+    const  {data:fetchedFamilyMember, isLoading:isgetFamilyMembersLoading, refetch:refetchFamily}  = useGetFamilyMembersQuery({});
     const [deleteUser, {isLoading:isDeleteUserLoading}] = useDeleteUserMutation();
 
     useEffect(()=>{
@@ -36,22 +39,22 @@ const ProfileScreen = () => {
        
     },[fetchedUser,fetchedFamilyMember])
 
-    const handleDelete = async (userName)=>{
+    const handleDelete = async (userName:string)=>{
         try {
             
             const res = await deleteUser({userName}).unwrap();
             refetchFamily();
-        } catch (err) {
+        } catch (err:any) {
             toast.error(err?.data?.message || err.error);
             
         }
 
     }
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString:string) => {
         if(dateString){
 
-            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const options:Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
             const date = new Date(dateString);
             return new Intl.DateTimeFormat('en-GB', options).format(date);
         }
@@ -64,13 +67,16 @@ const ProfileScreen = () => {
     <Row className="mb-4">
         <Col>
           <h2>User Information</h2>
-          <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
+          {user && spaceInfo && <>
+            <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
           <p><strong>Username:</strong> {user.userName}</p>
           <p><strong>Role:</strong> {user.role}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Gender:</strong> {user.gender}</p>
-          <p><strong>Date of Birth:</strong> {formatDate(user?.dateOfBirth)}</p>
+          <p><strong>Date of Birth:</strong> {formatDate(user.dateOfBirth)}</p>
           <p><strong>Space Name:</strong> {spaceInfo.spaceName}</p>
+          </>}
+          
         </Col>
       </Row>
       <h2>Family Members</h2>

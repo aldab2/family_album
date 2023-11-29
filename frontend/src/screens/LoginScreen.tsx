@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from "react";
 import {Link, useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux'
@@ -7,6 +8,7 @@ import {useLoginMutation} from '../slices/usersApiSlice'
 import { setCredentials } from "../slices/authSlice";
 import {toast}  from 'react-toastify'
 import Loader from '../components/Loader'
+import { RootState } from '../store';
 
 const LoginScreen = () =>{
     const [userName,setUserName] = useState('');
@@ -17,7 +19,7 @@ const LoginScreen = () =>{
 
     const [login,{isLoading}] = useLoginMutation();
 
-    const {userInfo} = useSelector((state)=> state.authReducer);
+    const {userInfo} = useSelector((state:RootState)=> state.authReducer);
 
     useEffect(()=>{
         if(userInfo){
@@ -25,14 +27,14 @@ const LoginScreen = () =>{
         }
     },[navigate,userInfo])
 
-    const submitHandler = async(e) => {
+    const submitHandler = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try{
             const res = await login({userName,password}).unwrap();
             dispatch(setCredentials({...res}))
             navigate('/')
         }
-        catch(err){
+        catch(err:any){
             toast.error(err?.data?.message || err.error);
         }
     }
