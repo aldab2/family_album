@@ -1,7 +1,9 @@
+import asyncHandler from 'express-async-handler'
 import mongoose from "mongoose"
 const ObjectId = mongoose.Types.ObjectId
 import Post from "../models/postModel.js"
 import Comment from "../models/commentModel.js"
+import { uploadFileFromEndpoint } from '../utils/minioUtils.js'
 
 async function newPost(req, res, next) {
     const {
@@ -83,10 +85,19 @@ async function editPost(req, res) {
     }
 }
 
+const minioUploadExample = asyncHandler(async (req, res) => {
+    const file = req.file;
+    console.log(file.buffer.length);
+    await uploadFileFromEndpoint("my-bucket",file.originalname,file)
+    res.send("done")
+
+});
+
 
 export {
     newPost,
     getPost,
     deletePost,
-    editPost
+    editPost,
+    minioUploadExample
 }

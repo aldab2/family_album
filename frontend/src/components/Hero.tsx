@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { Container, Card, Button } from 'react-bootstrap';
 import { FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
@@ -9,6 +9,33 @@ import { RootState } from '../store';
 
 const Hero: React.FC = () => {
   const { userInfo } = useSelector((state: RootState) => state.authReducer);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+        setSelectedFile(event.target.files[0]);
+    }
+};
+const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+
+  if (selectedFile) {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+          const response = await fetch('/api/post/mediaExample', {
+              method: 'POST',
+              body: formData,
+          });
+          const result = await response.json();
+          console.log(result);
+      } catch (error) {
+          console.error('Error uploading file:', error);
+      }
+  }
+};
+  
 
   return (
     <div className='py-5'>
@@ -19,6 +46,10 @@ const Hero: React.FC = () => {
             <p>Explore what's new in your Family Space.</p>
             <div className="mt-4">
               <h2>Family Album Gallery Here</h2>
+              <form className='m-3' onSubmit={handleSubmit}>
+              <input  type='file' onChange={handleFileChange}></input>
+              <Button type='submit' >Send file</Button>
+              </form>
             </div>
           </Card>
         ) : (

@@ -19,7 +19,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 
 app.use('/api/auth',authRoutes);
-app.use('/post',postRoutes)
+app.use('/api/post',postRoutes)
 
 
 app.get('/', (req, res) => {

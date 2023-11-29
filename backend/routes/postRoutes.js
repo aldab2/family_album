@@ -3,7 +3,8 @@ import {
     newPost,
     deletePost,
     getPost,
-    editPost
+    editPost,
+    minioUploadExample
 } from '../controllers/postController.js'
 import {
     addComment,
@@ -11,6 +12,10 @@ import {
     deleteComment
 } from '../controllers/commentController.js'
 import { protect } from '../middleware/authMidleware.js';
+import multer from 'multer'
+
+const upload = multer({ storage: multer.memoryStorage() });
+
 const router = express.Router()
 
 router.use(protect)
@@ -18,7 +23,8 @@ router.use(protect)
 router.post('/', newPost);
 router.put('/', editPost);
 router.delete('/', deletePost);
-router.get('/', getPost);
+router.get('/', getPost)
+router.post('/mediaExample',upload.single('file') ,minioUploadExample);
 
 router.post('/comment', addComment)
 router.put('/comment', editComment)
