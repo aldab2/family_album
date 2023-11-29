@@ -20,9 +20,12 @@ router.post('/family',registerFamily);
 router.get('/family',protect,getFamilyProfile);
 router.put('/family',protect,editFamilyProfile);
 router.delete('/family',protect,deleteFamilyProfile);
-router.route('/user').post(protect,addFamilyMember).get(protect,getUserProfile).put(protect,editFamilyMember).delete(protect,deleteFamilyMember)
+router.route('/user')
+    .post(protect,addFamilyMember)
+    .get(protect,getUserProfile)
+    .put(protect,editFamilyMember)
+    .delete(protect,deleteFamilyMember)
 router.put('/change-password',protect,changePassword)
 router.post('/logout',logoutUser);
-
 
 export default router;
