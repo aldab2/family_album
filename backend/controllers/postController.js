@@ -3,24 +3,39 @@ import mongoose from "mongoose"
 const ObjectId = mongoose.Types.ObjectId
 import Post from "../models/postModel.js"
 import Comment from "../models/commentModel.js"
-import { uploadFileFromEndpoint } from '../utils/minioUtils.js'
+import { deleteMediaForPost, getPresignedUrl, uploadFileFromEndpoint } from '../utils/minioUtils.js'
+import { getFormattedDate } from '../utils/generalUtils.js'
+import { get } from 'http'
 
-async function newPost(req, res, next) {
+const newPost = asyncHandler( async (req, res) => {
     const {
         content, 
         takenWith, 
         createdAt
     } = req.body
-    // const newPost = new Post(userDTO(req.user))
+
+    const file = req.file;
+
+    if(!file){
+        res.status(400);
+        throw new Error("Video or image is required");
+    }
+    
+
     const post = {
         content,
         author: req.user.userName,
         userId: req.user.id,
         family: req.user.family,
     }
+
+   
+    
+        // TODO needs error checking and more implementaitons
     if (takenWith) {
         post.takenWith = takenWith
     }
+
     if (createdAt) {
         
         post.createdAt = new Date(createdAt)
@@ -28,44 +43,68 @@ async function newPost(req, res, next) {
     const newPost = new Post(post)
     try {
         let mdb = await newPost.save()
+        const fileOriginalName = file.originalname;
+        const fileExtension = fileOriginalName.substring(fileOriginalName.lastIndexOf(".")+1);
+        const fileName= `${getFormattedDate()}.${fileExtension}`;
+        await uploadFileFromEndpoint(post.family,req.user.userName,mdb._id,fileName,file)
+
+        mdb.media.push(fileName);
+        await mdb.save();
+
         res.json(mdb)
     } catch (error) {
-        res.json(error)
+        res.status(500);
+        throw new Error(error);
     }
-}
 
-async function deletePost(req, res, next) {
+    
+    
+})
+
+const deletePost = asyncHandler(async (req, res) =>{
     const {
         id
     } = req.body
 
-    // console.log(new mongoose.Types.ObjectId(id))
     
     try {
         
-        let postDeletion = await Post.findOneAndDelete({id})
-        let commentDeletion = await Comment.deleteMany({
-            postId: ObjectId(id)
+        //let postDeletion = await Post.findOneAndDelete({id})
+        const post = await Post.findOne({_id:id});
+        const post_media = post.media;
+        console.log(post_media);
+        const postDeletion = await Post.findByIdAndDelete(id);
+        const  commentDeletion = await Comment.deleteMany({
+            postId: new ObjectId(id)
         })
+        deleteMediaForPost(req.user.family,req.user.userName,id,post_media)
+        
         
         res.json({
             postDeletion,
             commentDeletion
         })
     } catch (error) {
-        res.json(error)
+        res.status(500);
+        throw new Error(error)
     }
-}
+})
 
 
-async function getPost(req, res, next) {
+const  getPost = asyncHandler (async (req, res)=> {
     const familyPosts = await Post.find({
         family: req.user.family
-    })
-    res.json(familyPosts)
-}
+    }).populate('comments')
+    const postsWithMediaUrls = await Promise.all(familyPosts.map(async (post)=>{
+        const mediaUrls = await Promise.all(post.media.map(async (media)=>{
+            return await getPresignedUrl(req.user.family,req.user.userName,post._id.toString(),media)
+        }))
+        return { ...post.toObject(), mediaUrls };
+    }))
+    res.json(postsWithMediaUrls)
+})
 
-async function editPost(req, res) {
+const editPost = asyncHandler(async (req, res)=> {
     const {
         content,
         id
@@ -83,7 +122,7 @@ async function editPost(req, res) {
     } catch (error) {
         res.json({error})
     }
-}
+})
 
 const minioUploadExample = asyncHandler(async (req, res) => {
     const file = req.file;
