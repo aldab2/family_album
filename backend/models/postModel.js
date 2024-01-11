@@ -28,8 +28,14 @@ const postSchema = mongoose.Schema({
         ref: 'Family',
         required: true
     },
+    media:[{
+        type: String,
+        ref: 'User',
+        required: true
+    }],
     comments: [{
-      type: commentSchema
+      type: mongoose.Types.ObjectId,
+      ref: "Comment"
     }],
     edited: {
         type: Boolean,

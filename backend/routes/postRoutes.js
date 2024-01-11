@@ -20,7 +20,7 @@ const router = express.Router()
 
 router.use(protect)
 
-router.post('/', newPost);
+router.post('/', upload.single('file'),newPost);
 router.put('/', editPost);
 router.delete('/', deletePost);
 router.get('/', getPost)
