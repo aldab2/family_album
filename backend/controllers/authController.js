@@ -217,7 +217,8 @@ const editFamilyMember = asyncHandler(async (req, res) => {
         // The user is active if it is a child role or it does not have an email, else its inactive
         user.active = user.role === "child" || !user.email || userUpdateDTO.role === "child" || !userUpdateDTO.email
         if (user.active === false) {
-          await sendActivationEmail(user);
+          req.user = user;
+          await sendVerificationEmail(req, res);
         }
 
       }
