@@ -4,8 +4,9 @@ import Family from '../models/familyModel.js'
 import { generateToken, releaseToken } from '../utils/jwtUtils.js';
 import { FamilyCreateDTO, FamilyReadDTO } from '../DTOs/FamilyDTOs.js';
 import { UserCreateDTO, UserReadDTO, UserUpdateDTO } from '../DTOs/UserDTOs.js';
-import { sendActivationEmail } from '../utils/emailUtils.js';
 import changePasswordAndSave from '../utils/authUtils.js';
+import { getRandomActivationCode } from '../utils/util.js';
+import { sendVerificationEmail } from '../utils/emailUtils.js';
 
 /**
  * @desc Auth user/set token
@@ -45,7 +46,9 @@ const registerFamily = asyncHandler(async (req, res) => {
   const user = await User.create({
     ...familyCreateDTO,
     role: 'parent',
-    active: true
+    //avtive false in log in check if active or not 
+    active: false,
+    activationCode: getRandomActivationCode()
   })
   const family = await Family.create({
     spaceName: familyCreateDTO.spaceName,
@@ -58,6 +61,8 @@ const registerFamily = asyncHandler(async (req, res) => {
     generateToken(res, user._id);
     family.familyMembers = [user];
     const familyReadDto = new FamilyReadDTO(family);
+   req.user = user;
+    await sendVerificationEmail(req, res);
     res.status(201).json(familyReadDto);
   }
   else {
@@ -130,7 +135,8 @@ const addFamilyMember = asyncHandler(async (req, res) => {
     const user = await User.create({
       ...userCreateDto,
       active: isActive,
-      family: req.user.family
+      family: req.user.family,
+      activationCode: getRandomActivationCode()
     })
 
 
@@ -138,7 +144,8 @@ const addFamilyMember = asyncHandler(async (req, res) => {
       await Family.updateOne({ _id: req.user.family }, { $addToSet: { familyMembers: user._id } });
 
       if (!isActive) {
-        await sendActivationEmail(user);
+      req.user = user;
+      await sendVerificationEmail(req, res);
       }
 
       // Populate the family members and format the response with the FamilyReadDTO
@@ -174,7 +181,9 @@ const addFamilyMember = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getUserProfile = asyncHandler(async (req, res) => {
-  res.status(200).send(req.user);
+  let userInfo = {...req.user}
+  delete userInfo.activationCode;
+  res.status(200).send(userInfo);
 });
 
 
@@ -208,7 +217,8 @@ const editFamilyMember = asyncHandler(async (req, res) => {
         // The user is active if it is a child role or it does not have an email, else its inactive
         user.active = user.role === "child" || !user.email || userUpdateDTO.role === "child" || !userUpdateDTO.email
         if (user.active === false) {
-          await sendActivationEmail(user);
+          req.user = user;
+          await sendVerificationEmail(req, res);
         }
 
       }
@@ -318,6 +328,24 @@ const changePassword = asyncHandler(async (req, res) => {
   res.status(200).send({ message: "Password changed." })
 });
 
+const verifyCode = asyncHandler(async (req, res) => {
+  const { code } = req.body
+  if(req.user.active){
+    res.status(400);
+    throw new Error("User is already activated");
+  } 
+  if (code == req.user.activationCode) {
+  
+    const user = await User.findOne({userName: req.user.userName});
+    user.active = true;
+    await user.save();
+    res.status(200).json({message:"User activated"})
+  } else {
+    res.status(400)
+    throw new Error("VerificationCode does not match.")
+  }
+})
+
 
 export {
   login,
@@ -330,5 +358,6 @@ export {
   editFamilyMember,
   deleteFamilyMember,
   logoutUser,
-  changePassword
+  changePassword,
+  verifyCode
 };

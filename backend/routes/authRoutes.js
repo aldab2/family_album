@@ -9,14 +9,18 @@ import {login,
     addFamilyMember,
     changePassword,
     deleteFamilyMember,
-    editFamilyMember
+    editFamilyMember,
+    verifyCode
 }  from '../controllers/authController.js';
+import { sendVerificationEmail } from '../utils/emailUtils.js';
 import { protect } from '../middleware/authMidleware.js';
 
 const router = express.Router();
 
 router.post('/',login);
 router.post('/family',registerFamily);
+router.get('/send-verification-email',protect, sendVerificationEmail);
+router.post('/verify-code',protect, verifyCode);
 router.get('/family',protect,getFamilyProfile);
 router.put('/family',protect,editFamilyProfile);
 router.delete('/family',protect,deleteFamilyProfile);
