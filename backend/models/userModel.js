@@ -37,6 +37,10 @@ const userSchema = mongoose.Schema({
         required: true
     },
     active:{
+        type: Boolean,
+        required: true
+    },
+    activationCode: {
         type: String,
         required: true
     },

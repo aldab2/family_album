@@ -11,6 +11,7 @@ class UserReadDTO {
     this.gender = user.gender;
     this.dateOfBirth = user.dateOfBirth;
     this.active = user.active
+    this.activationCode = user.activationCode;
     // Exclude password from the DTO
     this.role = user.role;
     // Depending on how you want to handle references, you might want to populate this
