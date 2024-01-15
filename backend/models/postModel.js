@@ -17,7 +17,7 @@ const postSchema = mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: new Date().now,
+        default: Date().now,
     },
     takenWith: [{
         type: mongoose.Types.ObjectId,
@@ -40,6 +40,11 @@ const postSchema = mongoose.Schema({
     edited: {
         type: Boolean,
         default: false
+    },
+    visibility: {
+        type: String,
+        enum: ['public', 'private'],
+        default: 'private'
     }
 },
 {

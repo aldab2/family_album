@@ -10,6 +10,10 @@ const familySchema = mongoose.Schema({
         ref: 'User',
         required: true
     }],
+    friends: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Family'
+    }]
 },{
     timestamps:true
 });
