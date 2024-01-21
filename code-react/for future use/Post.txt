@@ -1,0 +1,96 @@
+{/* <div className="card-post-toolbar">
+                                        <Dropdown>
+                                            <Dropdown.Toggle variant="bg-transparent">
+                                            <span className="material-symbols-outlined">
+                                                more_horiz
+                                            </span>
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu className="dropdown-menu m-0 p-0">
+                                                <Dropdown.Item className=" p-3" to="#">
+                                                    <div className="d-flex align-items-top">
+                                                        <div className="h4 material-symbols-outlined">
+                                                            <i className="ri-save-line"></i>
+                                                        </div>
+                                                        <div className="data ms-2">
+                                                            <h6>Save Post</h6>
+                                                            <p className="mb-0">Add this to your saved items</p>
+                                                        </div>
+                                                    </div>
+                                                </Dropdown.Item>
+                                                <Dropdown.Item className= "p-3" to="#">
+                                                        <div className="d-flex align-items-top">
+                                                        <i className="ri-close-circle-line h4"></i>
+                                                        <div className="data ms-2">
+                                                            <h6>Hide Post</h6>
+                                                            <p className="mb-0">See fewer posts like this.</p>
+                                                        </div>
+                                                    </div>
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item className=" p-3" to="#">
+                                                        <div className="d-flex align-items-top">
+                                                            <i className="ri-user-unfollow-line h4"></i>
+                                                            <div className="data ms-2">
+                                                                <h6>Unfollow User</h6>
+                                                                <p className="mb-0">Stop seeing posts but stay friends.</p>
+                                                            </div>
+                                                        </div>
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item className=" p-3" to="#">
+                                                        <div className="d-flex align-items-top">
+                                                            <i className="ri-notification-line h4"></i>
+                                                            <div className="data ms-2">
+                                                                <h6>Notifications</h6>
+                                                                <p className="mb-0">Turn on notifications for this post</p>
+                                                            </div>
+                                                        </div>
+                                                    </Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </div>*/}
+
+
+
+
+                                            {/* If need multiple photos     */}
+                            {/* <div className=" d-grid grid-rows-2 grid-flow-col gap-3">
+                                <div className="row-span-2 row-span-md-1">
+                                    <img src={p2} alt="post1" className="img-fluid rounded w-100"/>
+                                </div>
+                                <div className="row-span-1">
+                                    <img src={p1} alt="post2" className="img-fluid rounded w-100"/>
+                                </div>
+                                <div className="row-span-1 ">
+                                    <img src={p3} alt="post3" className="img-fluid rounded w-100"/>
+                                </div>
+                            </div> */}
+
+
+
+
+
+
+                                                                    {/* <li className="me-3 mb-md-0 mb-2">
+                                            <Link to="#" className="btn btn-soft-primary">
+                                                <img src={img2} alt="icon" className="img-fluid me-2"/> Tag Friend
+                                            </Link>
+                                        </li> */}
+                                        {/* <li>
+                                            <button className=" btn btn-soft-primary">
+                                                <div className="card-header-toolbar d-flex align-items-center">
+                                                    <Dropdown>
+                                                        <Dropdown.Toggle as='div'className="lh-1">
+                                                        <span className="material-symbols-outlined">
+                                                            more_horiz
+                                                        </span>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item  onClick={handleShow}  href="#">Check in</Dropdown.Item>
+                                                            <Dropdown.Item  onClick={handleShow}  href="#">Live Video</Dropdown.Item>
+                                                            <Dropdown.Item  onClick={handleShow}  href="#">Gif</Dropdown.Item> 
+                                                            <Dropdown.Item  onClick={handleShow}  href="#">Watch Party</Dropdown.Item> 
+                                                            <Dropdown.Item  onClick={handleShow}  href="#">Play with Friend</Dropdown.Item> 
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                            </button>
+                                        </li> */}
