@@ -6,6 +6,7 @@ import Comment from "../models/commentModel.js"
 import { deleteMediaForPost, getPresignedUrl, uploadFileFromEndpoint } from '../utils/minioUtils.js'
 import { getFormattedDate } from '../utils/generalUtils.js'
 import { get } from 'http'
+import Family from '../models/familyModel.js'
 
 const newPost = asyncHandler( async (req, res) => {
     const {
@@ -91,18 +92,51 @@ const deletePost = asyncHandler(async (req, res) =>{
 })
 
 
-const  getPost = asyncHandler (async (req, res)=> {
-    const familyPosts = await Post.find({
-        family: req.user.family
-    }).populate('comments')
-    const postsWithMediaUrls = await Promise.all(familyPosts.map(async (post)=>{
-        const mediaUrls = await Promise.all(post.media.map(async (media)=>{
-            return await getPresignedUrl(req.user.family,req.user.userName,post._id.toString(),media)
-        }))
+const getPost = asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    // Initialize the query object
+    let query = {};
+
+    // Check for 'userId' filter
+    if (req.query.onlyMyPosts === 'true') {
+        query.userId = req.query.userId;
+    }
+
+    // Check for 'postId' filter
+    if (req.query.postId) {
+        query._id = req.query.postId;
+    }
+
+    // Check for 'type' filter
+    if (req.query.type === 'all') {
+        const userFamily = await  Family.findOne({_id:req.user.family})
+        query.$or = [
+            { family: userFamily._id },
+            { family: { $in: userFamily.friends }, visibility: 'public' }
+        ];
+    } else {
+        // Default to family
+        query.family = req.user.family;
+    }
+
+    const posts = await Post.find(query)
+                            .skip(skip)
+                            .limit(limit)
+                            .populate('comments');
+
+    const postsWithMediaUrls = await Promise.all(posts.map(async (post) => {
+        const mediaUrls = await Promise.all(post.media.map(async (media) => {
+            return await getPresignedUrl(req.user.family, req.user.userName, post._id.toString(), media);
+        }));
         return { ...post.toObject(), mediaUrls };
-    }))
-    res.json(postsWithMediaUrls)
-})
+    }));
+
+    res.json(postsWithMediaUrls);
+});
+
 
 const editPost = asyncHandler(async (req, res)=> {
     const {
