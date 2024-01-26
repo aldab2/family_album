@@ -16,9 +16,10 @@ import p4 from '../../assets/images/page-img/p4.jpg'
 import icon2 from '../../assets/images/icon/02.png'
 
 import loader from '../../assets/images/page-img/page-load-loader.gif'
-import { useGetPostsQuery, useLazyGetPostsQuery } from '../../store/slices/postsApiSlice'
-import { useDispatch } from 'react-redux'
+import { useAddPostMutation, useGetPostsQuery, useLazyGetPostsQuery } from '../../store/slices/postsApiSlice'
+import { useDispatch, useSelector } from 'react-redux'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { toast } from 'react-toastify'
 
 
 
@@ -28,16 +29,21 @@ const Index = () => {
     const [page, setPage] = useState(1);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedPostVisibility, setSelectedPostVisibility] = useState('Family Members');
+    const [postText,setPostText] = useState('');
     const dispatch = useDispatch();
 
+    const {userInfo} = useSelector((state)=> state.authReducer);
     const { data, isLoading, isFetching, error } = useGetPostsQuery({ page });
+    const [addPost,{isLoading:isAddPostLoading,error:addPostError}] = useAddPostMutation();
     const [hasMorePosts, setHasMorePosts] = useState(true);
 
 
 
    
     useEffect(() => {
+        console.log("Data:", data);
         if (data) {
             if (data.length === 0) {
                 setHasMorePosts(false);
@@ -100,6 +106,54 @@ const Index = () => {
             setPage(prevPage => prevPage + 1);
         }
     };
+
+    const handleSelectPostVisibility = (item) => {
+        setSelectedPostVisibility(item);
+    };
+
+    const handleFileChange = (event) => {
+        if (event.target.files) {
+          setSelectedFile(event.target.files[0]);
+        }
+      };
+      const handlePostButton = async (event) => {
+        event.preventDefault();
+    
+        if (selectedFile && postText) {
+          const formData = new FormData();
+          formData.append("file", selectedFile);
+          formData.append("content",postText);
+
+          switch(selectedPostVisibility) {
+            case 'Family Members':
+              formData.append("visibility","private")
+              break;
+            case 'Family Friends':
+                formData.append("visibility","friends")
+              break;
+            case 'Public':
+                formData.append("visibility","public")
+              break;
+              default:
+                toast.error("Unknown Visibility Option",selectedPostVisibility)
+                break
+          }
+
+          const postResult = await addPost(formData).unwrap();
+
+          if(addPostError && !isAddPostLoading){
+            toast.error(addPostError);
+          }
+          else {
+            setPosts(prevPosts=>[postResult,...prevPosts]);
+            toast.success("Postt Added");
+            handleClose();
+          }
+        }
+        else {
+            toast.info("Fields Missing")
+        }
+      };
    
 
     return (
@@ -122,19 +176,26 @@ const Index = () => {
                                             <img src={user1} alt="user1" className="avatar-60 rounded-circle"/>
                                         </div> */}
                                             <form className="post-text ms-3 w-100 " onClick={handleShow}>
-                                                <input type="text" className="form-control rounded" placeholder="Write something here..." style={{ border: "none" }} />
+                                                <input type="text" className="form-control rounded" placeholder="Write something here..." onChange={(e)=>setPostText(e.target.value)} value={postText} style={{ border: "none" }} />
                                             </form>
                                         </div>
                                         <hr></hr>
                                         <ul className=" post-opt-block d-flex list-inline m-0 p-0 flex-wrap">
-                                            <li className="me-3 mb-md-0 mb-2">
-                                                <Link to="#" className="btn btn-soft-primary">
-                                                    <img src={img1} alt="icon" className="img-fluid me-2" /> Photo/Video
-                                                </Link>
-                                            </li>
-
-
-
+                                        <li className="me-3 mb-md-0 mb-2">
+    <input 
+        type="file" 
+        id="file-upload" 
+        style={{ display: 'none' }} 
+        onChange={handleFileChange} // Add a handler for file selection
+        accept="image/*,video/*" // Accept images and videos
+    />
+    <button 
+        className="btn btn-soft-primary" 
+        onClick={() => document.getElementById('file-upload').click()}
+    >
+        <img src={img1} alt="icon" className="img-fluid me-2" /> Photo/Video
+    </button>
+</li>
                                         </ul>
                                     </Card.Body>
                                     <Modal size="lg" className="fade" id="post-modal" onHide={handleClose} show={show} >
@@ -149,20 +210,37 @@ const Index = () => {
                                                 {/* <div className="user-img">
                                                 <img src={user1} alt="user1" className="avatar-60 rounded-circle img-fluid"/>
                                             </div> */}
-                                                <form className="post-text ms-3 w-100 " data-bs-toggle="modal" data-bs-target="#post-modal">
-                                                    <input type="text" className="form-control rounded" placeholder="Write something here..." style={{ border: "none" }} />
-                                                </form>
+                                                <form className="post-text ms-3 w-100" data-bs-toggle="modal" data-bs-target="#post-modal">
+    <textarea
+        className="form-control rounded"
+        placeholder="Write something here..."
+        style={{ border: "none", overflowY: "hidden", resize: "none" }}
+        rows="1"
+        onChange={(e)=>setPostText(e.target.value)}
+        value={postText}
+        onInput={(e) => {
+            e.target.style.height = 'inherit';
+            e.target.style.height = `${e.target.scrollHeight}px`;
+        }}
+    ></textarea>
+</form>
                                             </div>
                                             <hr />
                                             <ul className="d-flex flex-wrap align-items-center list-inline m-0 p-0">
-                                                <li className="col-md-6 mb-3">
-                                                    <div className="bg-soft-primary rounded p-2 pointer me-3"><Link to="#"></Link>
-                                                        <img src={img1} alt="icon" className="img-fluid" /> Photo/Video</div>
-                                                </li>
+                                            <li className="col-md-6 mb-3">
+                <div className="bg-soft-primary rounded p-2 pointer me-3" style={{ cursor: 'pointer' }} onClick={() => document.getElementById('file-upload').click()}>
+                
+                    <img src={img1} alt="icon" className="img-fluid" /> Photo/Video
+                </div>
+            </li>
                                                 {/* <li className="col-md-6 mb-3">
                                                 <div className="bg-soft-primary rounded p-2 pointer me-3"><Link to="#"></Link>
                                                 <img src={img2} alt="icon" className="img-fluid"/> Tag Friend</div>
                                             </li> */}
+
+{selectedFile &&  <li className="col-md-6 mb-3">
+                                        <div className='text-primary'> Uploading:</div> {selectedFile.name}
+                                    </li> }
                                             </ul>
                                             <hr />
                                             <div className="other-option">
@@ -172,19 +250,19 @@ const Index = () => {
                                                     <img src={user1} alt="user1" className="avatar-60 rounded-circle img-fluid"/>
                                                 </div> */}
                                                         <div>
-                                                            <h4>Share Post with:</h4>
+                                                            <h4 className='text-primary'>Share Post with:</h4>
                                                         </div>
                                                         <div>
-                                                            <p className="mb-0 text-primary">This Controls who can see your Post</p>
+                                                            <p className="mb-0">This Controls who can see your Post</p>
                                                         </div>
                                                     </div>
                                                     <div className="card-post-toolbar">
                                                         <Dropdown>
                                                             <Dropdown.Toggle as={CustomToggle} role="button">
-                                                                <span className="btn btn-primary">Friend</span>
+                                                                <span className="btn btn-primary">{selectedPostVisibility}</span>
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu className=" m-0 p-0">
-                                                                <Dropdown.Item className=" p-3" to="#">
+                                                                <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('Family Members')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-user-unfollow-line h4"></i>
                                                                         <div className="data ms-2">
@@ -193,7 +271,7 @@ const Index = () => {
                                                                         </div>
                                                                     </div>
                                                                 </Dropdown.Item>
-                                                                <Dropdown.Item className="p-3" to="#">
+                                                                <Dropdown.Item className="p-3" to="#" onClick={()=>handleSelectPostVisibility('Family Friends')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-close-circle-line h4"></i>
                                                                         <div className="data ms-2">
@@ -202,7 +280,7 @@ const Index = () => {
                                                                         </div>
                                                                     </div>
                                                                 </Dropdown.Item>
-                                                                <Dropdown.Item className=" p-3" to="#">
+                                                                <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('Public')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-save-line h4"></i>
                                                                         <div className="data ms-2">
@@ -217,9 +295,13 @@ const Index = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button type="submit" className="btn btn-primary d-block w-100 mt-3">Post</button>
+                                            <button type="button" onClick={handlePostButton} className="btn btn-primary d-block w-100 mt-3">Post</button>
                                         </Modal.Body>
                                     </Modal>
+
+                                   {selectedFile &&  <Card.Footer>
+                                    <div className='text-primary'> Uploading:</div> {selectedFile.name}
+                                    </Card.Footer> }
                                 </Card>
                             </Col>
 
@@ -248,9 +330,9 @@ const Index = () => {
                                                         <div className="w-100">
                                                             <div className="d-flex justify-content-between">
                                                                 <div>
-                                                                    <h5 className="mb-0 d-inline-block">{post.author}</h5>
+                                                                    <h5 className="mb-0 d-inline-block text-primary">{post.author}</h5>
                                                                     {/* <span className="mb-0 ps-1 d-inline-block">Add New Post</span> */}
-                                                                    <p className="mb-0 text-primary">{timeAgo(post.createdAt)}</p>
+                                                                    <p className="mb-0 text-secondary">{timeAgo(post.createdAt)}</p>
                                                                 </div>
 
                                                             </div>
