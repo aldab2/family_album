@@ -10,9 +10,14 @@ const familySchema = mongoose.Schema({
         ref: 'User',
         required: true
     }],
+    // friendRequests:[{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'FriendReqest'
+    // }],
     friends: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Family'
+        ref: 'Family',
+        unique: true
     }]
 },{
     timestamps:true
