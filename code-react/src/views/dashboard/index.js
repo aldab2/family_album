@@ -16,7 +16,7 @@ import p4 from '../../assets/images/page-img/p4.jpg'
 import icon2 from '../../assets/images/icon/02.png'
 
 import loader from '../../assets/images/page-img/page-load-loader.gif'
-import { useAddPostMutation, useGetPostsQuery, useLazyGetPostsQuery } from '../../store/slices/postsApiSlice'
+import { useAddPostMutation, useDeletePostMutation, useGetPostsQuery, useLazyGetPostsQuery } from '../../store/slices/postsApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { toast } from 'react-toastify'
@@ -32,12 +32,14 @@ const Index = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedPostVisibility, setSelectedPostVisibility] = useState('Family Members');
     const [postText,setPostText] = useState('');
+    const [hasMorePosts, setHasMorePosts] = useState(true);
+
     const dispatch = useDispatch();
 
     const {userInfo} = useSelector((state)=> state.authReducer);
     const { data, isLoading, isFetching, error } = useGetPostsQuery({ page });
     const [addPost,{isLoading:isAddPostLoading,error:addPostError}] = useAddPostMutation();
-    const [hasMorePosts, setHasMorePosts] = useState(true);
+    const [deletePost,{isLoading:isDeletePostLoading,error:deletePostError}] = useDeletePostMutation();
 
 
 
@@ -154,6 +156,23 @@ const Index = () => {
             toast.info("Fields Missing")
         }
       };
+
+      const handleDeletePost = async (postToDelete) => {
+        try {
+            const deletion = await deletePost({ id: postToDelete._id }).unwrap();
+            const deletedPost = deletion.postDeletion
+            
+            console.log("Before deletion:", posts); // Debugging
+            console.log("Deleted Post",deletedPost)
+            const updatedPosts = posts.filter(post => post._id !== deletedPost._id);
+            setPosts(updatedPosts);
+            console.log("After deletion:", updatedPosts); // Debugging
+    
+            toast.success("Post Deleted Successfully");
+        } catch (deletePostError) {
+            toast.error(deletePostError.toString());
+        }
+    };
    
 
     return (
@@ -172,9 +191,7 @@ const Index = () => {
                                     </div>
                                     <Card.Body >
                                         <div className="d-flex align-items-center">
-                                            {/* <div className="user-img">
-                                            <img src={user1} alt="user1" className="avatar-60 rounded-circle"/>
-                                        </div> */}
+
                                             <form className="post-text ms-3 w-100 " onClick={handleShow}>
                                                 <input type="text" className="form-control rounded" placeholder="Write something here..." onChange={(e)=>setPostText(e.target.value)} value={postText} style={{ border: "none" }} />
                                             </form>
@@ -331,10 +348,57 @@ const Index = () => {
                                                             <div className="d-flex justify-content-between">
                                                                 <div>
                                                                     <h5 className="mb-0 d-inline-block text-primary">{post.author}</h5>
-                                                                    {/* <span className="mb-0 ps-1 d-inline-block">Add New Post</span> */}
                                                                     <p className="mb-0 text-secondary">{timeAgo(post.createdAt)}</p>
                                                                 </div>
+                                                                <div className="card-post-toolbar">
+                                                        <Dropdown>
+                                                            <Dropdown.Toggle variant="bg-transparent">
+                                                            <span className="material-symbols-outlined">
+                                                                more_horiz
+                                                            </span>
+                                                            </Dropdown.Toggle>
+                                                            <Dropdown.Menu className="dropdown-menu m-0 p-0">
+                                                                
+                                                                <Dropdown.Item className= "p-3" to="#" onClick={()=>handleDeletePost(post)}>
+                                                                        <div className="d-flex align-items-top">
+                                                                        <i className="ri-close-circle-line h4"></i>
+                                                                        <div className="data ms-2 ">
+                                                                            <h6>Delete Post</h6>
+                                                                            <p className="mb-0">This will permenantly remove this post.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    </Dropdown.Item>
+                                                                    <Dropdown.Item className=" p-3" to="#">
+                                                                        <div className="d-flex align-items-top">
+                                                                            <i className=" ri-eye-off-line h4"></i>
+                                                                            <div className="data ms-2">
+                                                                                <h6>Make it for family only</h6>
+                                                                                <p className="mb-0">Only family can see this post.</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </Dropdown.Item>
+                                                                    <Dropdown.Item className=" p-3" to="#">
+                                                                        <div className="d-flex align-items-top">
+                                                                            <i className=" ri-eye-fill h4"></i>
+                                                                            <div className="data ms-2">
+                                                                                <h6>Make Public</h6>
+                                                                                <p className="mb-0">Public for all to see</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </Dropdown.Item>
 
+                                                                    <Dropdown.Item className=" p-3" to="#">
+                                                                        <div className="d-flex align-items-top">
+                                                                            <i className=" ri-group-fill h4"></i>
+                                                                            <div className="data ms-2">
+                                                                                <h6>Make it for family and freinds</h6>
+                                                                                <p className="mb-0">Family and freinds only can see this</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </Dropdown.Item>
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
+                                                        </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -347,7 +411,6 @@ const Index = () => {
                                                     {getMediaType(post.media[0]) == 'image' && <Link to="#"><img src={post.mediaUrls[0]} alt="post1" className="img-fluid rounded w-100" /></Link>}
 
                                                     {getMediaType(post.media[0]) == 'video' && <div className="ratio ratio-16x9">
-                                                        {/* <iframe title="vedio" src={post.mediaUrls[0]} ></iframe> */}
                                                         <video controls>
                                                             <source src={post.mediaUrls[0]} type="video/mp4" />
                                                             Your browser does not support the video tag.
