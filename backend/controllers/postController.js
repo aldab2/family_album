@@ -129,7 +129,7 @@ const getPost = asyncHandler(async (req, res) => {
 
     const postsWithMediaUrls = await Promise.all(posts.map(async (post) => {
         const mediaUrls = await Promise.all(post.media.map(async (media) => {
-            return await getPresignedUrl(req.user.family, req.user.userName, post._id.toString(), media);
+            return await getPresignedUrl(req.user.family, post.author, post._id.toString(), media);
         }));
         return { ...post.toObject(), mediaUrls };
     }));
