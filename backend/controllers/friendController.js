@@ -23,7 +23,7 @@ const getFriendRequests = asyncHandler(async (req, res) => {
 
 
 // send friend request
-const addFriendRequest = asyncHandler(async (req, res) => {
+const sendFriendRequest = asyncHandler(async (req, res) => {
 
     const senderFamilyId = req.user.family
     const senderFirstName = req.user.firstName
@@ -42,7 +42,7 @@ const addFriendRequest = asyncHandler(async (req, res) => {
     // If already friends
     let stringifiedFriendIds = senderFamily.friends.map(id => id.toString())
     if (stringifiedFriendIds.includes(recipientFamilyId.toString())) {
-      res.status(400).send("Already friends")
+      res.status(400).send("This Family already a friend.")
       return
     }
 
@@ -76,70 +76,100 @@ const deleteFriendRequest = asyncHandler(async (req, res) => {
   }
 })
 
-const acceptFriendRequest = asyncHandler(async (req, res) => {
-  const {
-    id
-  } = req.body
-  const recipientFamilyId = req.user.family;
-  
-  try {
-    const friendRequest = await FriendReqest.findOne({_id: id})
-    const recipientFamily = await Family.findOne({_id: recipientFamilyId})
-    const senderFamily = await Family.findOne({_id: friendRequest.senderFamilyId})
-    const {senderFamilyId} = senderFamily
-    
-   
 
-    if (!recipientFamilyId.equals(friendRequest.recipientFamilyId)) {
-      res.status(401).json({
-        message: "This friend request is not for you",
-        senderFamilyId,
-        recipientFamilyId
-      })
-      return
+//accepts friend request
+const acceptFriendRequest = asyncHandler(async (req, res) => {
+  const { id } = req.body; // ID of the friend request
+  const recipientFamilyId = req.user.family; // The recipient's family ID, assumed to be the current user's family
+
+  try {
+    // Fetch the friend request, recipient family, and sender family in one go to reduce database calls
+    const friendRequest = await FriendReqest.findOne({ _id: id });
+    if (!friendRequest) {
+      return res.status(404).send("Friend request not found.");
     }
 
-    recipientFamily.friends.push(friendRequest.senderFamilyId)
-    senderFamily.friends.push(recipientFamilyId)
-    await recipientFamily.save()
-    await senderFamily.save()
-    await FriendReqest.findOneAndUpdate({_id: id}, {status: 'accepted'})
-    res.send("Success")
+    const [recipientFamily, senderFamily] = await Promise.all([
+      Family.findOne({ _id: recipientFamilyId }),
+      Family.findOne({ _id: friendRequest.senderFamilyId })
+    ]);
+
+    // Check if the friend request is intended for the recipient
+    if (!recipientFamilyId.equals(friendRequest.recipientFamilyId)) {
+      return res.status(401).json({
+        message: "This friend request is not for you",
+        recipientFamilyId,
+        senderFamilyId: friendRequest.senderFamilyId
+      });
+    }
+
+    // Check for an existing friendship in both directions
+    if (recipientFamily.friends.includes(friendRequest.senderFamilyId.toString()) && senderFamily.friends.includes(recipientFamilyId.toString())) {
+      return res.status(400).send("The friend request has already been accepted.");
+    }
+
+    // Start a session for a transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // Add each other to their friends lists
+      recipientFamily.friends.push(friendRequest.senderFamilyId);
+      senderFamily.friends.push(recipientFamilyId);
+
+      // Save both families and update the friend request status within the transaction
+      await Promise.all([
+        recipientFamily.save({ session }),
+        senderFamily.save({ session }),
+        FriendReqest.findOneAndUpdate({ _id: id }, { status: 'accepted' }, { session })
+      ]);
+
+      // Commit the transaction
+      await session.commitTransaction();
+      res.send("Friend request accepted successfully.");
+    } catch (error) {
+      // Abort the transaction in case of error
+      await session.abortTransaction();
+      console.error("Error accepting friend request:", error);
+      res.status(500).json({ message: "Failed to accept friend request." });
+    } finally {
+      // End the session
+      session.endSession();
+    }
   } catch (error) {
-    console.log(error)
-    res.status(404).json(error) 
-  }  
+    console.error("Error finding documents:", error);
+    res.status(500).json({ message: "An error occurred." });
+  }
 });
 
 
-const rejectFriendrequest = asyncHandler(async (req, res) => {
-  const {
-    id
-  } = req.body
-  const recipientFamilyId = req.user.family;
-  
+const rejectFriendRequest  = asyncHandler(async (req, res) => {
+  const { id } = req.body; // ID of the friend request to reject
+  const recipientFamilyId = req.user.family; // The recipient's family ID, assumed to be the current user's family
+
   try {
-    const friendRequest = await FriendReqest.findOne({_id: id})
-    const recipientFamily = await Family.findOne({_id: recipientFamilyId})
-    
-    
-
-   
-
-    if (!recipientFamilyId.equals(friendRequest.recipientFamilyId)) {
-      res.status(401).json({
-        message: "This friend request is not for you",
-        recipientFamilyId
-      })
-      return
+    // Fetch the friend request to ensure it exists and is intended for the recipient
+    const friendRequest = await FriendReqest.findOne({ _id: id });
+    if (!friendRequest) {
+      return res.status(404).send("Friend request not found.");
     }
 
-    await FriendReqest.findOneAndUpdate({_id: id}, {status: 'rejected'})
-    res.send("Friend request rejected")
+    // Check if the friend request is intended for the recipient
+    if (!recipientFamilyId.equals(friendRequest.recipientFamilyId)) {
+      return res.status(401).json({
+        message: "This friend request is not for you",
+        recipientFamilyId
+      });
+    }
+
+    // Update the friend request status to 'rejected'
+    await FriendReqest.findOneAndUpdate({ _id: id }, { status: 'rejected' });
+
+    res.send("Friend request rejected successfully.");
   } catch (error) {
-    console.log(error)
-    res.status(404).json(error) 
-  }  
+    console.error("Error rejecting friend request:", error);
+    res.status(500).json({ message: "An error occurred while rejecting the friend request." });
+  }
 });
 
 const getFamilyFriends = async (req, res) => {
@@ -185,10 +215,10 @@ const removeFamilyFriend = async (req, res) => {
 
 export {
     getFriendRequests,
-    addFriendRequest,
+    sendFriendRequest,
     deleteFriendRequest,
     acceptFriendRequest,
-    rejectFriendrequest,
+    rejectFriendRequest,
     getFamilyFriends,
     removeFamilyFriend
 }
