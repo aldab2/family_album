@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import  authRoutes from './routes/authRoutes.js'
 import  postRoutes from './routes/postRoutes.js'
+import friendRoutes from './routes/friendRoutes.js'
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
@@ -20,6 +21,7 @@ app.use(cookieParser());
 
 app.use('/api/auth',authRoutes);
 app.use('/api/post',postRoutes)
+app.use('/api/friend',friendRoutes)
 
 
 app.get('/', (req, res) => {
