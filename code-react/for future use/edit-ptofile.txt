@@ -1,0 +1,50 @@
+personal info
+
+
+
+{/* <Form.Gro
+                                              {/* <Form.Group className="form-group col-sm-6">
+                                                  <Form.Label className="form-label">Marital Status:</Form.Label>
+                                                  <Form.Select defaultValue="Single" className="form-select" aria-label="Default select example">
+                                                      <option>Single</option>
+                                                      <option>Married</option>
+                                                      <option>Widowed</option>
+                                                      <option>Divorced</option>
+                                                      <option>Separated </option>
+                                                  </Form.Select>
+                                              </Form.Group> */}
+                                              {/* <Form.Group className="form-group col-sm-6">
+                                                  <Form.Label className="form-label">Age:</Form.Label>
+                                                  <Form.Select className="form-select" aria-label="Default select example 2">
+                                                  <option>46-62</option>
+                                                  <option>63 </option>
+                                                  </Form.Select>
+                                              </Form.Group>
+                                              <Form.Group className="form-group col-sm-6">
+                                                  <Form.Label  className="form-label">Country:</Form.Label>
+                                                  <Form.Select defaultValue="USA"  className="form-select" aria-label="Default select example 3">
+                                                  <option>Caneda</option>
+                                                  <option>Noida</option>
+                                                  <option>USA</option>
+                                                  <option>India</option>
+                                                  <option>Africa</option>
+                                                  </Form.Select>
+                                              </Form.Group> */}
+                                              {/* <Form.Group className="form-group col-sm-6">
+                                                  <Form.Label className="form-label">State:</Form.Label>
+                                                  <Form.Select defaultValue="Georgia" className="form-select" aria-label="Default select example 4">
+                                                      <option>California</option>
+                                                      <option>Florida</option>
+                                                      <option>Georgia</option>
+                                                      <option>Connecticut</option>
+                                                      <option>Louisiana</option>
+                                                  </Form.Select>
+                                              </Form.Group> */}
+                                              {/* <Form.Group className="form-group col-sm-12">
+                                                  <Form.Label className="form-label">Address:</Form.Label>
+                                                  <Form.Control as="textarea" className="form-control" rows={5} style={{lineHeight: "22px"}} placeholder=" 37 Cardinal Lane
+                                                  Petersburg, VA 23803
+                                                  United States of America
+                                                  Zip Code: 85001">
+                                                  </Form.Control>
+                                              </Form.Group> */}

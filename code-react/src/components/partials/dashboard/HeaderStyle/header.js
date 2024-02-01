@@ -261,7 +261,7 @@ const Header = () => {
                           edit_note
                         </span>
                         <div className="ms-3">
-                          <Link to="#" className="mb-0 h6">
+                          <Link to="/dashboard/app/user-profile-edit" className="mb-0 h6">
                             Edit Profile
                           </Link>
                         </div>

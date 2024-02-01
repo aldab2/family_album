@@ -1,11 +1,57 @@
 import React from 'react'
 import {Container, Row, Col, Card, Tab, Form, Button, Nav} from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react';
 
-//image
-import img1 from '../../../assets/images/user/11.png'
 
 const UserProfileEdit =() =>{
+
+    const [user, setUser] = useState({
+        id: "",
+        firstName: "",
+        lastName: "",
+        userName: "",
+        email: "",
+        gender: "",
+        dateOfBirth: "",
+        role: "",
+        family: "",
+        createdAt: "",
+        updatedAt: "",
+    });
+    
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Include the 'Authorization' header with your JWT token
+                // You need to replace 'YOUR_TOKEN_HERE' with the actual token
+
+
+
+
+                const token = 'jwt'; // This should be dynamically obtained, e.g., from login response or local storage
+    
+                const response = await fetch('http://localhost:5000/api/auth/user', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`, // Ensure this is how your backend expects the token
+                    },
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                const data = await response.json();
+                setUser(data);
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        };
+    
+        fetchUserData();
+    }, []);
+
   return(
       <>
         <Container>
@@ -44,7 +90,29 @@ const UserProfileEdit =() =>{
               <Col lg={12}>
                   {/* <div className="iq-edit-list-data"> */}
                       <Tab.Content>
-                          <Tab.Pane eventKey="first" className="fade show">
+                          <UserInfo user = {user} />
+
+                          <ChangePassword />
+
+                          <EmailAndSMS />
+
+                          <ManageContact />   
+                                               
+                      </Tab.Content>
+                  {/* </div> */}
+              </Col>
+          </Row>
+          </Tab.Container>
+        </Container>
+      </>
+  )
+
+}
+
+
+function UserInfo({user}){
+    return (
+        <Tab.Pane eventKey="first" className="fade show">
                               <Card>
                                   <Card.Header className="d-flex justify-content-between">
                                       <div className="header-title">
@@ -53,33 +121,26 @@ const UserProfileEdit =() =>{
                                   </Card.Header>
                                   <Card.Body>
                                       <Form>
-                                          <Form.Group className="form-group align-items-center">
-                                              <Col md="12">
-                                                  <div className="profile-img-edit">
-                                                    <img className="profile-pic" src={img1} alt="profile-pic"/>
-                                                    <div className="p-image">
-                                                        <i className="ri-pencil-line upload-button text-white"></i>
-                                                        <input className="file-upload" type="file" accept="image/*"/>
-                                                    </div>
-                                                  </div>
-                                              </Col>
-                                          </Form.Group>
+                                        <div className="d-flex justify-content-end">
+                                            <Button type="edit" className="btn btn-primary me-2">Edit</Button>
+                                        </div>
+                                          
                                           <Row className="align-items-center">
                                               <Form.Group className="form-group col-sm-6">
                                                   <Form.Label htmlFor="fname"  className="form-label">First Name:</Form.Label>
-                                                  <Form.Control type="text" className="form-control" id="fname" placeholder="Bni"/>
+                                                  <Form.Control type="text" className="form-control" id="fname" value={user.firstName}  />
                                               </Form.Group>
                                               <Form.Group className="form-group col-sm-6">
                                                   <Form.Label htmlFor="lname" className="form-label">Last Name:</Form.Label>
-                                                  <Form.Control type="text" className="form-control" id="lname" placeholder="Jhon"/>
+                                                  <Form.Control type="text" className="form-control" id="lname" value={user.lastName}/>
                                               </Form.Group>
                                               <Form.Group className="form-group col-sm-6">
                                                   <Form.Label htmlFor="uname" className="form-label">User Name:</Form.Label>
-                                                  <Form.Control type="text" className="form-control" id="uname" placeholder="Bni@01"/>
+                                                  <Form.Control type="text" className="form-control" id="uname" value={user.userName}/>
                                               </Form.Group>
                                               <Form.Group className="form-group col-sm-6">
-                                                  <Form.Label htmlFor="cname" className="form-label">City:</Form.Label>
-                                                  <Form.Control type="text" className="form-control" id="cname" placeholder="Atlanta"/>
+                                                  <Form.Label htmlFor="cname" className="form-label">Email:</Form.Label>
+                                                  <Form.Control type="text" className="form-control" id="cname" value={user.email}/>
                                               </Form.Group>
                                               <Form.Group className="form-group col-sm-6">
                                                   <Form.Label className="form-label d-block">Gender:</Form.Label>
@@ -94,53 +155,17 @@ const UserProfileEdit =() =>{
                                               </Form.Group>
                                               <Form.Group className="form-group col-sm-6">
                                                   <Form.Label htmlFor="dob" className="form-label">Date Of Birth:</Form.Label>
-                                                  <Form.Control className="form-control" id="dob" placeholder="1984-01-24"/>
+                                                  <Form.Control className="form-control" id="dob" value={user.dateOfBirth}/>
                                               </Form.Group>
                                               <Form.Group className="form-group col-sm-6">
-                                                  <Form.Label className="form-label">Marital Status:</Form.Label>
-                                                  <Form.Select defaultValue="Single" className="form-select" aria-label="Default select example">
-                                                      <option>Single</option>
-                                                      <option>Married</option>
-                                                      <option>Widowed</option>
-                                                      <option>Divorced</option>
-                                                      <option>Separated </option>
-                                                  </Form.Select>
+                                                  <Form.Label htmlFor="dob" className="form-label">Role:</Form.Label>
+                                                  <Form.Control className="form-control" id="dob" value={user.role}/>
                                               </Form.Group>
                                               <Form.Group className="form-group col-sm-6">
-                                                  <Form.Label className="form-label">Age:</Form.Label>
-                                                  <Form.Select className="form-select" aria-label="Default select example 2">
-                                                  <option>46-62</option>
-                                                  <option>63 </option>
-                                                  </Form.Select>
+                                                  <Form.Label htmlFor="dob" className="form-label">Family:</Form.Label>
+                                                  <Form.Control className="form-control" id="dob" value={user.family}/>
                                               </Form.Group>
-                                              <Form.Group className="form-group col-sm-6">
-                                                  <Form.Label  className="form-label">Country:</Form.Label>
-                                                  <Form.Select defaultValue="USA"  className="form-select" aria-label="Default select example 3">
-                                                  <option>Caneda</option>
-                                                  <option>Noida</option>
-                                                  <option>USA</option>
-                                                  <option>India</option>
-                                                  <option>Africa</option>
-                                                  </Form.Select>
-                                              </Form.Group>
-                                              <Form.Group className="form-group col-sm-6">
-                                                  <Form.Label className="form-label">State:</Form.Label>
-                                                  <Form.Select defaultValue="Georgia" className="form-select" aria-label="Default select example 4">
-                                                      <option>California</option>
-                                                      <option>Florida</option>
-                                                      <option>Georgia</option>
-                                                      <option>Connecticut</option>
-                                                      <option>Louisiana</option>
-                                                  </Form.Select>
-                                              </Form.Group>
-                                              <Form.Group className="form-group col-sm-12">
-                                                  <Form.Label className="form-label">Address:</Form.Label>
-                                                  <Form.Control as="textarea" className="form-control" rows={5} style={{lineHeight: "22px"}} placeholder=" 37 Cardinal Lane
-                                                  Petersburg, VA 23803
-                                                  United States of America
-                                                  Zip Code: 85001">
-                                                  </Form.Control>
-                                              </Form.Group>
+                                              
                                           </Row>
                                           <Button type="submit" className="btn btn-primary me-2">Submit</Button>
                                           <Button type="reset" className="btn bg-soft-danger">Cancel</Button>
@@ -148,7 +173,14 @@ const UserProfileEdit =() =>{
                                   </Card.Body>
                               </Card>
                           </Tab.Pane>
-                          <Tab.Pane eventKey="second" className="fade show">
+    )
+}
+
+
+
+function ChangePassword() {
+    return(
+        <Tab.Pane eventKey="second" className="fade show">
                               <Card>
                                   <Card.Header className="d-flex justify-content-between">
                                   <div className="iq-header-title">
@@ -176,7 +208,13 @@ const UserProfileEdit =() =>{
                                   </Card.Body>
                               </Card>
                           </Tab.Pane>
-                          <Tab.Pane eventKey="third" className="fade show">
+    )
+}
+
+
+function EmailAndSMS(){
+    return(
+        <Tab.Pane eventKey="third" className="fade show">
                               <Card>
                                   <Card.Header className="card-header d-flex justify-content-between">
                                     <div className="header-title">
@@ -243,7 +281,13 @@ const UserProfileEdit =() =>{
                                   </Card.Body>
                               </Card>
                           </Tab.Pane>
-                          <Tab.Pane eventKey="fourth" className="fade show">
+    )
+}
+
+
+function ManageContact(){
+    return (
+        <Tab.Pane eventKey="fourth" className="fade show">
                               <Card>
                                   <Card.Header className="d-flex justify-content-between">
                                   <div className="header-title">
@@ -270,15 +314,6 @@ const UserProfileEdit =() =>{
                                   </Card.Body>
                               </Card>
                           </Tab.Pane>
-                      </Tab.Content>
-                  {/* </div> */}
-              </Col>
-          </Row>
-          </Tab.Container>
-        </Container>
-      </>
-  )
-
+    )
 }
-
 export default UserProfileEdit;
