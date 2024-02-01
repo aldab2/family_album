@@ -1,7 +1,7 @@
 import React from "react";
 
 // auth
-import ConfirmMail from "../views/dashboard/auth/confirm-mail";
+import ActivateAccount from "../views/dashboard/auth/activate-account";
 import LockScreen from "../views/dashboard/auth/lock-screen";
 import Recoverpw from "../views/dashboard/auth/recoverpw";
 import SignIn from "../views/dashboard/auth/sign-in";
@@ -17,8 +17,8 @@ import ComingSoon from "../views/dashboard/extrapages/comingsoon";
 
 export const SimpleRouter = [
   {
-    path: "auth/confirm-mail",
-    element: <ConfirmMail />,
+    path: "auth/activate",
+    element: <ActivateAccount />,
   },
   {
     path: "auth/lock-screen",

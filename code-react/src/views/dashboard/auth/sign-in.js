@@ -33,12 +33,14 @@ const SignIn = () => {
 
    const [login, { isLoading }] = useLoginMutation();
 
-   const { userInfo } = useSelector(state => state.userReducer) || {};
+   const { userInfo } = useSelector(state => state.authReducer) || {};
 
    useEffect(() => {
       if (userInfo) {
+         
          navigate('/')
       }
+      console.log(userInfo)
    }, [navigate, userInfo])
 
 
@@ -51,6 +53,7 @@ const SignIn = () => {
       }
       catch (err) {
          toast.error(err?.data?.message || err.error);
+         
       }
    }
 
@@ -112,6 +115,7 @@ const SignIn = () => {
                                  id="exampleInputUsername"
                                  placeholder="Enter Username"
                                  value={userName}
+                                 tabIndex={1}
                                  onChange={(e) => setUserName(e.target.value)}
                               />
                            </Form.Group>
@@ -123,6 +127,7 @@ const SignIn = () => {
                                id="exampleInputPassword1" 
                                placeholder="Password" 
                                value={password}
+                               tabIndex={2}
                               onChange={(e) => setPassword(e.target.value)} />
                            </Form.Group>
                            <div className="d-inline-block w-100">
@@ -130,7 +135,7 @@ const SignIn = () => {
                                  <Form.Check.Input type="checkbox" className="me-2" id="customCheck11" />
                                  <Form.Check.Label>Remember Me</Form.Check.Label>{' '}
                               </Form.Check>
-                              <Button variant="primary" type="submit" className="float-end">Sign in</Button>
+                              <Button variant="primary" type="submit" className="float-end" tabIndex={3}>Sign in</Button>
                            </div>
                            <div className="sign-info">
                               <span className="dark-color d-inline-block line-height-2">Don't have an account? <Link to="/auth/sign-up">Sign up</Link></span>

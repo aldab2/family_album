@@ -339,12 +339,14 @@ const verifyCode = asyncHandler(async (req, res) => {
     const user = await User.findOne({userName: req.user.userName});
     user.active = true;
     await user.save();
-    res.status(200).json({message:"User activated"})
+    res.status(200).json(new UserReadDTO(user))
   } else {
     res.status(400)
     throw new Error("VerificationCode does not match.")
   }
 })
+
+
 
 
 export {
