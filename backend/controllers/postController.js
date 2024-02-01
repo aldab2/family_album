@@ -12,7 +12,8 @@ const newPost = asyncHandler( async (req, res) => {
     const {
         content, 
         takenWith, 
-        createdAt
+        createdAt,
+        visibility
     } = req.body
 
     const file = req.file;
@@ -28,6 +29,7 @@ const newPost = asyncHandler( async (req, res) => {
         author: req.user.userName,
         userId: req.user.id,
         family: req.user.family,
+        visibility
     }
 
    
@@ -52,7 +54,19 @@ const newPost = asyncHandler( async (req, res) => {
         mdb.media.push(fileName);
         await mdb.save();
 
-        res.json(mdb)
+        
+
+            const postWithMediaUrls = async (mdb) => {
+                const mediaUrls = await Promise.all(mdb.media.map(async (media) => {
+                    return await getPresignedUrl(req.user.family, mdb.author, mdb._id.toString(), media);
+                }));
+            
+                return { ...mdb.toObject(), mediaUrls };
+            };
+            
+        
+
+        res.json(await postWithMediaUrls(mdb))
     } catch (error) {
         res.status(500);
         throw new Error(error);
@@ -115,7 +129,7 @@ const getPost = asyncHandler(async (req, res) => {
         const userFamily = await  Family.findOne({_id:req.user.family})
         query.$or = [
             { family: userFamily._id },
-            { family: { $in: userFamily.friends }, visibility: 'public' }
+            { family: { $in: userFamily.friends },  visibility: { $in: ['friends', 'public'] }  }
         ];
     } else {
         // Default to family
@@ -125,11 +139,12 @@ const getPost = asyncHandler(async (req, res) => {
     const posts = await Post.find(query)
                             .skip(skip)
                             .limit(limit)
+                            .sort({ createdAt: -1 })
                             .populate('comments');
 
     const postsWithMediaUrls = await Promise.all(posts.map(async (post) => {
         const mediaUrls = await Promise.all(post.media.map(async (media) => {
-            return await getPresignedUrl(req.user.family, req.user.userName, post._id.toString(), media);
+            return await getPresignedUrl(req.user.family, post.author, post._id.toString(), media);
         }));
         return { ...post.toObject(), mediaUrls };
     }));
