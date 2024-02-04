@@ -4,11 +4,11 @@ import {Container, Row, Col, Card, Tab, Form, Button, Nav} from 'react-bootstrap
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
-import { useGetUserInfoQuery, useUpdateUserMutation } from '../../../store/slices/profileApiSlice';
+import { useGetUserInfoQuery, useGetFamilyMembersQuery, useUpdateUserMutation, useChangePasswordMutation } from '../../../store/slices/profileApiSlice';
 
 
 
-const familyMembers = {
+const familyMembers2 = {
     id: "65a9328c79bd3261ba6ac4ac",
     spaceName: "Gashlan",
     Members: [
@@ -54,13 +54,14 @@ const familyMembers = {
 const UserProfileEdit =() =>{
     
     const { data: userInfo, refetch } = useGetUserInfoQuery();
-    
+    const { data: family, isLoading, isError, error } = useGetFamilyMembersQuery();
+    // console.log("the Family: ", family)
     // const { userInfo } = useSelector((state) => state.authReducer);
     // const { userInfo } = useSelector(state => state.userReducer) || {};
-    console.log("userinfo=", userInfo)
+    // console.log("userinfo=", userInfo)
 
     const [userInput, setUserInput] = useState({...userInfo});
-    const [updateUser, { isLoading, isSuccess, isError, error }] = useUpdateUserMutation();
+    const [updateUser, { isLoading2, isSuccess2, isError2, error2 }] = useUpdateUserMutation();
     
     // useEffect(() => {
     //     console.log(userInfo, userInput)
@@ -70,7 +71,7 @@ const UserProfileEdit =() =>{
 
     useEffect(() => {
         if (userInfo) {
-            console.log("UserInfo updated:", userInfo);
+            //console.log("UserInfo updated:", userInfo);
             setUserInput({ ...userInfo });
         }
     }, [userInfo]); // Remove 'userInput' from dependency array
@@ -118,7 +119,9 @@ const UserProfileEdit =() =>{
 
                           <ChangePassword />
 
-                          {familyMembers.Members.map((member) => <FamilyMember key={member.id} member={member} />)}
+                          <FamilyInfo family= {familyMembers2} />
+
+                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} />)}
 
 
                           <ManageContact />   
@@ -171,7 +174,7 @@ function UserInfo({ userInput, onUserInput, userInfo, updateUser, refetch}){
             ...userInput, // Spread the updated userInput fields
             currentUserName: userInfo.userName, // Include the original userName to find the user
         };
-        console.log("Updating user with payload:", payload);
+        // console.log("Updating user with payload:", payload);
     
         try {
             await updateUser(payload).unwrap();
@@ -216,7 +219,7 @@ function UserInfo({ userInput, onUserInput, userInfo, updateUser, refetch}){
                                     <Form.Control type="text" className="form-control" id="cname" readOnly={!isEditMode} value={userInput.email || ""} onChange={(e) => onUserInput({...userInput, email: e.target.value})} />
                                 </Form.Group>
                                 <Form.Group className="form-group col-sm-6">
-                                    <Form.Label className="form-label d-block">Gender:</Form.Label>
+                                    <Form.Label  className="form-label d-block">Gender:</Form.Label>
                                     <Form.Check className="form-check form-check-inline">
                                 <Form.Check.Input 
                                     className="form-check-input" 
@@ -246,7 +249,7 @@ function UserInfo({ userInput, onUserInput, userInfo, updateUser, refetch}){
                                 </Form.Group>
                                 <Form.Group className="form-group col-sm-6">
                                     <Form.Label htmlFor="dob" className="form-label">Date Of Birth:</Form.Label>
-                                    <Form.Control className="form-control" id="dob" readOnly={!isEditMode} value={userInput.dateOfBirth || ""} onChange={(e) => onUserInput({...userInput, dateOfBirth: e.target.value})} />
+                                    <Form.Control className="form-control" id="dob" type = "date" readOnly={!isEditMode} value={userInput.dateOfBirth ? userInput.dateOfBirth.split('T')[0] : ''} onChange={(e) => onUserInput({...userInput, dateOfBirth: e.target.value})} />
                                 </Form.Group>
                                 <Form.Group className="form-group col-sm-6">
                                     <Form.Label htmlFor="role" className="form-label">Role:</Form.Label>
@@ -286,23 +289,29 @@ function ChangePassword() {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [verifyPassword, setVerifyPassword] = useState('');
-    const handleSubmit = (e) => {
-        e.preventDefault(); 
+    const [changePassword, { isLoading }] = useChangePasswordMutation();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-        // Simple validation
         if (newPassword !== verifyPassword) {
             toast.error('Passwords do not match!');
             return;
-        }
-
-        else if (newPassword.length < 8){
+        } else if (newPassword.length < 8) {
             toast.error('Passwords must be at least 8 characters long');
             return;
         }
 
-        // TODO: Submit the new password to the server
-        toast.success('Password updated successfully');
-        // You would typically send a request to your server here
+        try {
+            // Call the mutation with the current and new password
+            await changePassword({ currentPassword, newPassword }).unwrap();
+            toast.success('Password updated successfully');
+            // Clear the form fields
+            setCurrentPassword('');
+            setNewPassword('');
+            setVerifyPassword('');
+        } catch (error) {
+            toast.error(`Password update failed: ${error.data?.message || 'An error occurred'}`);
+        }
     };
     return(
         <Tab.Pane eventKey="second" className="fade show">
@@ -337,65 +346,241 @@ function ChangePassword() {
 }
 
 
-function FamilyMember({member}){
+
+// function FamilyInfo() {
+//     const { data: familyInfo, isLoading, isError, error } = useGetFamilyMembersQuery();
+
+//     if (isLoading) return <p>Loading family information...</p>;
+//     if (isError) return <p>Error loading family information: {error?.data?.message || 'An unknown error occurred'}</p>;
+
+//     return (
+//         <Card>
+//             <Card.Header>Family Information</Card.Header>
+//             <ListGroup variant="flush">
+//                 {familyInfo?.Members?.map((member, index) => (
+//                     <ListGroup.Item key={index}>
+//                         <p>Name: {member.firstName} {member.lastName}</p>
+//                         <p>Username: {member.userName}</p>
+//                         <p>Email: {member.email}</p>
+//                         <p>Role: {member.role}</p>
+//                         {/* Add more fields as necessary */}
+//                     </ListGroup.Item>
+//                 ))}
+//             </ListGroup>
+//         </Card>
+//     );
+// }
+
+
+function FamilyInfo({family}){
     return (
         <Tab.Pane eventKey="third" className="fade show">
             <Card>
                 <Card.Header className="d-flex justify-content-between">
                     <div className="header-title">
-                        <h4 className="card-title">Personal Information</h4>
+                        <h4 className="card-title">Family Information</h4>
                     </div>
                 </Card.Header>
                 <Card.Body>
-                    <Form>
+                    <Form >
                         <div className="d-flex justify-content-end">
-                            <Button type="edit" className="btn btn-primary me-2">Edit</Button>
+                            <Button type="button" className="btn btn-primary me-2" >Edit</Button>
+                            <Button type="button" className="btn btn-primary me-2" >Add User</Button>
+                            <Button type="button" variant="danger" className="btn me-2">Delete</Button>
+                        </div>
+                             
+                        
+                    </Form>
+                       
+                
+                </Card.Body>
+            </Card>
+        </Tab.Pane>
+    )
+}
+
+function FamilyMember({member, updateUser}){
+  const [isEditMode, setIsEditMode] = useState(false); // Track edit mode
+  const [editMember, setEditMember] = useState(member); // State for editing member
+
+  // Handle edit mode toggle
+  const toggleEditMode = () => {
+    setIsEditMode(!isEditMode);
+    setEditMember(member); // Reset edit form to initial member data when toggling edit mode
+  };
+
+  // Update editMember state on form change
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditMember({ ...editMember, [name]: value });
+  };
+
+  // Placeholder for update functionality
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Ensure you have the unique identifier for the user; using userName as an example
+    const uniqueIdentifier = editMember.userName; // Adjust based on your data structure
+
+    const payload = {
+        ...editMember, // Spread the updated userInput fields
+        currentUserName: uniqueIdentifier, // Use the unique identifier for the user being updated
+    };
+
+    // console.log("Updating user with payload:", payload);
+
+    try {
+        // Call your updateUser mutation with the payload
+        const result = await updateUser(payload).unwrap(); // Assuming your mutation is set up to accept and process this payload correctly
+        
+        // console.log('Update successful', result);
+        toast.success('Member updated successfully!');
+        setEditMember(result);
+        // If you have a method to refetch or update the local state to reflect the updated information, call it here
+        setIsEditMode(false); // Exit edit mode after successful update
+    } catch (err) {
+        console.error('Failed to update member:', err);
+        toast.error(`Update failed: ${err.data?.message || 'An error occurred'}`);
+    }
+};
+
+  // Placeholder for delete functionality
+  const handleDelete = () => {
+    // console.log('Delete member:', member.id);
+    // Here you would call your API to delete the member
+  };
+    return (
+        <Tab.Pane eventKey="third" className="fade show">
+            <Card>
+                <Card.Header className="d-flex justify-content-between">
+                    <div className="header-title">
+                        <h4 className="card-title">User Information</h4>
+                    </div>
+                </Card.Header>
+                <Card.Body>
+                    <Form onSubmit={handleSubmit}>
+                        <div className="d-flex justify-content-end">
+                            <Button type="button" className="btn btn-primary me-2" onClick={toggleEditMode} >Edit</Button>
+                            <Button variant="danger" onClick={handleDelete} className="ms-2">Delete</Button>
                         </div>
                             
-                            <Row className="align-items-center">
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label htmlFor={member.id+"fname"}  className="form-label">First Name:</Form.Label>
-                                    <Form.Control type="text" className="form-control" id={member.id+"fname"} value={member.firstName}  />
-                                </Form.Group>
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label htmlFor={member.id+"lname"} className="form-label">Last Name:</Form.Label>
-                                    <Form.Control type="text" className="form-control" id={member.id+"lname"} value={member.lastName}/>
-                                </Form.Group>
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label htmlFor={member.id+"uname"} className="form-label">User Name:</Form.Label>
-                                    <Form.Control type="text" className="form-control" id={member.id+"uname"} value={member.userName}/>
-                                </Form.Group>
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label htmlFor={member.id+"cname"} className="form-label">Email:</Form.Label>
-                                    <Form.Control type="text" className="form-control" id={member.id+"cname"} value={member.email}/>
-                                </Form.Group>
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label className="form-label d-block">Gender:</Form.Label>
-                                    <Form.Check className="form-check form-check-inline">
-                                        <Form.Check.Input className="form-check-input" type="radio" name="inlineRadioOptions" id={member.id+"inlineRadio10"} defaultValue="option1"/>
-                                        <Form.Check.Label className="form-check-label" htmlFor={member.id+"inlineRadio10"}> Male</Form.Check.Label>
-                                    </Form.Check>
-                                    <Form.Check className="form-check form-check-inline">
-                                        <Form.Check.Input className="form-check-input" type="radio" name="inlineRadioOptions" id={member.id+"inlineRadio11"} defaultValue="option1"/>
-                                        <Form.Check.Label className="form-check-label" htmlFor={member.id+"inlineRadio11"}>Female</Form.Check.Label>
-                                    </Form.Check>
-                                </Form.Group>
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label htmlFor={member.id+"dob"} className="form-label">Date Of Birth:</Form.Label>
-                                    <Form.Control className="form-control" id={member.id+"dob"} value={member.dateOfBirth}/>
-                                </Form.Group>
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label htmlFor={member.id+"role"} className="form-label">Role:</Form.Label>
-                                    <Form.Control className="form-control" id={member.id+"role"} value={member.role}/>
-                                </Form.Group>
-                                <Form.Group className="form-group col-sm-6">
-                                    <Form.Label htmlFor={member.id+"family"} className="form-label">Family:</Form.Label>
-                                    <Form.Control className="form-control" id={member.id+"family"} value={member.family}/>
-                                </Form.Group>
+                        <Row className="align-items-center">
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-fname`} className="form-label">First Name:</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                className="form-control" 
+                                id={`${member.id}-fname`}
+                                name="firstName" // Make sure the name matches your state property names
+                                value={editMember.firstName} 
+                                onChange={handleInputChange} 
+                                readOnly={!isEditMode} // Make fields editable only in edit mode
+                                />
+                            </Form.Group>
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-lname`} className="form-label">Last Name:</Form.Label>
+                            <Form.Control 
+                            type="text" 
+                            className="form-control" 
+                            id={`${member.id}-lname`}
+                            name="lastName"
+                            value={editMember.lastName} 
+                            onChange={handleInputChange} 
+                            readOnly={!isEditMode}
+                            />
+                            </Form.Group>
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-email`} className="form-label">Email:</Form.Label>
+                            <Form.Control 
+                                type="email" 
+                                className="form-control" 
+                                id={`${member.id}-email`}
+                                name="email"
+                                value={editMember.email} 
+                                onChange={handleInputChange} 
+                                readOnly={!isEditMode}
+                            />
+                            </Form.Group>
+
+
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-userName`} className="form-label">User Name:</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                className="form-control" 
+                                id={`${member.id}-userName`}
+                                name="userName"
+                                value={editMember.userName} 
+                                onChange={handleInputChange} 
+                                readOnly={!isEditMode}
+                            />
+                            </Form.Group>
+
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-gender`} className="form-label">Gender:</Form.Label>
+                            <Row>
+                                <Col>
+                                <Form.Check 
+                                    type="radio" 
+                                    label="Male" 
+                                    name="gender" 
+                                    id={`${member.id}-male`}
+                                    value="male"
+                                    checked={editMember.gender === "male"} 
+                                    onChange={handleInputChange}
+                                    disabled={!isEditMode}
+                                />
+                                </Col>
+                                <Col>
+                                <Form.Check 
+                                    type="radio" 
+                                    label="Female" 
+                                    name="gender" 
+                                    id={`${member.id}-female`}
+                                    value="female"
+                                    checked={editMember.gender === "female"} 
+                                    onChange={handleInputChange}
+                                    disabled={!isEditMode}
+                                />
+                                </Col>
+                            </Row>
+                            </Form.Group>
+
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-dob`} className="form-label">Date Of Birth:</Form.Label>
+                            <Form.Control 
+                                type="date" 
+                                className="form-control" 
+                                id={`${member.id}-dob`}
+                                name="dateOfBirth"
+                                value={editMember.dateOfBirth ? editMember.dateOfBirth.split('T')[0] : ''} 
+                                onChange={handleInputChange} 
+                                readOnly={!isEditMode}
+                            />
+                            </Form.Group>
+
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-role`} className="form-label">Role:</Form.Label>
+                            <Form.Select 
+                                id={`${member.id}-role`} 
+                                name="role"
+                                value={editMember.role} 
+                                onChange={handleInputChange} 
+                                disabled={!isEditMode}
+                            >
+                                <option value="parent">Parent</option>
+                                <option value="child">Child</option>
+                                <option value="adult">Adult</option>
+                            </Form.Select>
+                            </Form.Group>
                                 
                             </Row>
-                            <Button type="submit" className="btn btn-primary me-2">Submit</Button>
-                            <Button type="reset" className="btn bg-soft-danger">Cancel</Button>
+                            {isEditMode && (
+                                <>
+                                    <Button type="submit" className="btn btn-primary me-2">Submit</Button>
+                                    <Button type="button" className="btn bg-soft-danger" onClick={toggleEditMode}>Cancel</Button>
+                                </>
+                            )}
                     </Form>
                 </Card.Body>
             </Card>
@@ -421,7 +606,7 @@ function ManageContact(){
                                           </Form.Group>
                                           <Form.Group className="form-group">
                                               <Form.Label htmlFor="email"  className="form-label">Email:</Form.Label>
-                                              <Form.Control type="text" className="form-control" id="email" defaultValue="Bnijone@demo.com"/>
+                                              <Form.Control type="email" className="form-control" id="email" defaultValue="Bnijone@demo.com"/>
                                           </Form.Group>
                                           <Form.Group className="form-group">
                                               <Form.Label htmlFor="url"  className="form-label">Url:</Form.Label>

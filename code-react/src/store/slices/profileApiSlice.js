@@ -32,8 +32,15 @@ export const profileApiSlice = apiSlice.injectEndpoints({
                 body: userData,
             }),
         }),
+        changePassword: builder.mutation({
+            query: ({ currentPassword, newPassword }) => ({
+                url: '/api/auth/change-password', // Adjust URL as necessary
+                method: 'PUT',
+                body: { currentPassword, newPassword },
+            }),
+        }),
         
     })
 });
 
-export const { useGetFamilyMembersQuery, useGetUserInfoQuery, useDeleteUserMutation, useUpdateUserMutation } = profileApiSlice;
+export const { useGetFamilyMembersQuery, useGetUserInfoQuery, useDeleteUserMutation, useUpdateUserMutation, useChangePasswordMutation } = profileApiSlice;
