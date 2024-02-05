@@ -12,10 +12,10 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 
                 // Construct query string based on parameters
                 const queryString = new URLSearchParams({
-                    ...(page && { page: page.toString() }),
-                    ...(onlyMyPosts && { onlyMyPosts: onlyMyPosts.toString() }),
+                    page: page.toString(),
+                    onlyMyPosts: onlyMyPosts.toString(), // Always include to differentiate true/false
                     ...(type && { type }),
-                }).toString();
+                  }).toString();
 
                 // Construct the final URL
                 const url = `${POSTS_URL}?${queryString}`;
