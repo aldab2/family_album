@@ -4,57 +4,23 @@ import {Container, Row, Col, Card, Tab, Form, Button, Nav} from 'react-bootstrap
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
-import { useGetUserInfoQuery, useGetFamilyMembersQuery, useUpdateUserMutation, useChangePasswordMutation } from '../../../store/slices/profileApiSlice';
+import { useGetUserInfoQuery, useUpdateUserMutation, useChangePasswordMutation, useDeleteUserMutation, useAddFamilyMemberMutation  } from '../../../store/slices/profileApiSlice';
+import {useGetFamilyMembersQuery, useEditFamilyProfileMutation } from '../../../store/slices/profileApiSlice';
 
 
-
-const familyMembers2 = {
-    id: "65a9328c79bd3261ba6ac4ac",
-    spaceName: "Gashlan",
-    Members: [
-        {
-            id: "65a9328c79bd3261ba6ac4aa",
-            firstName: "Ayman",
-            lastName: "Gashlan",
-            userName: "gashlan",
-            email: "agashlan1991@gmail.com",
-            gender: "male",
-            dateOfBirth: "1991-05-22T00:00:00.000Z",
-            active: true,
-            activationCode: "15550",
-            role: "parent",
-            family: "65a9328c79bd3261ba6ac4ac",
-            createdAt: "2024-01-18T14:15:40.345Z",
-            updatedAt: "2024-02-01T06:03:42.512Z"
-        },
-        {
-            id: "65bb5c5bcb6c4397255aef3a",
-            firstName: "XYZ",
-            lastName: "ASD",
-            userName: "admin2",
-            email: "asd@asd.com",
-            gender: "female",
-            dateOfBirth: "2024-05-05T00:00:00.000Z",
-            active: false,
-            activationCode: "62896",
-            role: "parent",
-            family: "65a9328c79bd3261ba6ac4ac",
-            createdAt: "2024-02-01T08:54:51.435Z",
-            updatedAt: "2024-02-01T08:54:51.435Z"
-        }
-    ],
-    createdAt: "2024-01-18T14:15:40.448Z",
-    updatedAt: "2024-02-01T08:54:51.528Z"
-}
 
 
 
 
 
 const UserProfileEdit =() =>{
-    
+
+    const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
     const { data: userInfo, refetch } = useGetUserInfoQuery();
     const { data: family, isLoading, isError, error } = useGetFamilyMembersQuery();
+    const [editFamilyProfile, { isLoading: isEditing }] = useEditFamilyProfileMutation();
+    const [addFamilyMember, { isLoading: isAdding }] = useAddFamilyMemberMutation();
+
     // console.log("the Family: ", family)
     // const { userInfo } = useSelector((state) => state.authReducer);
     // const { userInfo } = useSelector(state => state.userReducer) || {};
@@ -87,26 +53,26 @@ const UserProfileEdit =() =>{
                       <Card.Body className="p-0">
                           <div>
                               <Nav as="ul" variant="pills" className="iq-edit-profile row">
-                                  <Nav.Item as="li" className="col-md-3 p-0">
+                                  <Nav.Item as="li" className="col-sm p-0">
                                       <Nav.Link  eventKey="first" role="button">
                                           Personal Information
                                       </Nav.Link>
                                   </Nav.Item>
-                                  <Nav.Item as="li" className="col-md-3 p-0">
+                                  <Nav.Item as="li" className="col-sm p-0">
                                       <Nav.Link eventKey="second" role="button">
                                           Change Password
                                       </Nav.Link>
                                   </Nav.Item>
-                                  <Nav.Item as="li" className="col-md-3 p-0">
+                                  <Nav.Item as="li" className="col-sm p-0">
                                       <Nav.Link  eventKey="third" role="button">
-                                          FamilyMember
+                                          Family Profile
                                       </Nav.Link>
                                   </Nav.Item>
-                                  <Nav.Item as="li" className="col-md-3 p-0">
+                                  {/* <Nav.Item as="li" className="col-md-3 p-0">
                                       <Nav.Link eventKey="fourth" role="button">
                                           Manage Contact
                                       </Nav.Link>
-                                  </Nav.Item>
+                                  </Nav.Item> */}
                               </Nav>
                           </div>
                       </Card.Body>
@@ -119,12 +85,12 @@ const UserProfileEdit =() =>{
 
                           <ChangePassword />
 
-                          <FamilyInfo family= {familyMembers2} />
+                          <FamilyInfo family= {family} editFamilyProfile={editFamilyProfile} addFamilyMember ={addFamilyMember}  />
 
-                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} />)}
+                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = {deleteUser} />)}
 
 
-                          <ManageContact />   
+                          {/* <ManageContact />    */}
                                                
                       </Tab.Content>
                   {/* </div> */}
@@ -347,32 +313,92 @@ function ChangePassword() {
 
 
 
-// function FamilyInfo() {
-//     const { data: familyInfo, isLoading, isError, error } = useGetFamilyMembersQuery();
-
-//     if (isLoading) return <p>Loading family information...</p>;
-//     if (isError) return <p>Error loading family information: {error?.data?.message || 'An unknown error occurred'}</p>;
-
-//     return (
-//         <Card>
-//             <Card.Header>Family Information</Card.Header>
-//             <ListGroup variant="flush">
-//                 {familyInfo?.Members?.map((member, index) => (
-//                     <ListGroup.Item key={index}>
-//                         <p>Name: {member.firstName} {member.lastName}</p>
-//                         <p>Username: {member.userName}</p>
-//                         <p>Email: {member.email}</p>
-//                         <p>Role: {member.role}</p>
-//                         {/* Add more fields as necessary */}
-//                     </ListGroup.Item>
-//                 ))}
-//             </ListGroup>
-//         </Card>
-//     );
-// }
 
 
-function FamilyInfo({family}){
+
+function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMember  }) {
+
+    // Initialize state for edit mode and edited space name
+    const [isEditMode, setIsEditMode] = useState(false);
+    // Use a fallback for family object to prevent accessing properties of undefined
+    const [editedSpaceName, setEditedSpaceName] = useState(family ? family.spaceName : '');
+    // Conditional rendering based on whether the family object exists
+    const [showAddMemberForm, setShowAddMemberForm] = useState(false);
+    const [newMember, setNewMember] = useState({
+        firstName: '',
+        lastName: '',
+        userName: '',
+        role: '',
+        password: '',
+        email: '',
+        gender: '',
+        dateOfBirth: '',
+    });
+    if (!family) {
+        return (
+            <Tab.Pane eventKey="third" className="fade show">
+                <Card>
+                    <Card.Body>Loading family information...</Card.Body>
+                </Card>
+            </Tab.Pane>
+        );
+    }
+
+    // Extract and format creation and update dates
+    const formattedCreatedAt = new Date(family.createdAt).toLocaleDateString("en-US");
+    const formattedUpdatedAt = new Date(family.updatedAt).toLocaleDateString("en-US");
+
+    const handleEdit = () => setIsEditMode(true);
+    const handleSave = async () => {
+        try {
+            // Assuming your API expects an object with a 'spaceName' property
+            await editFamilyProfile({ id: family.id, spaceName: editedSpaceName }).unwrap();
+            toast.success('Family space name updated successfully!');
+            setIsEditMode(false);
+            // You might want to refetch family data here if it's being fetched in a parent component
+        } catch (error) {
+            toast.error(`Failed to update family space name: ${error.message}`);
+        }
+    };
+    
+    const handleCancel = () => {
+        setEditedSpaceName(family.spaceName); // Reset to initial space name
+        setIsEditMode(false);
+    };
+    
+    const handleAddMemberShow = () => setShowAddMemberForm(true);
+    const handleAddMemberHide = () => setShowAddMemberForm(false);
+    const handleAddMemberChange = (e) => {
+        const { name, value } = e.target;
+        setNewMember({ ...newMember, [name]: value });
+    };
+    const handleAddMemberSubmit = async (e) => {
+        e.preventDefault(); // Prevent form from causing page reload
+        try {
+            // Adjust the payload as per your API's expectations
+            await addFamilyMember({
+                ...newMember,
+                familyId: family.id, // Assuming your API needs a family ID
+            }).unwrap();
+            toast.success('Family member added successfully!');
+            handleAddMemberHide(); // Hide the add member form
+            // Reset form fields after successful submission
+            setNewMember({
+                firstName: '',
+                lastName: '',
+                userName: '',
+                role: '',
+                password: '',
+                email: '',
+                gender: '',
+                dateOfBirth: '',
+            });
+            // Optionally, refetch or update family members list here
+        } catch (error) {
+            toast.error(`Failed to add family member: ${error.data?.message || 'An error occurred'}`);
+        }
+    };
+
     return (
         <Tab.Pane eventKey="third" className="fade show">
             <Card>
@@ -382,24 +408,174 @@ function FamilyInfo({family}){
                     </div>
                 </Card.Header>
                 <Card.Body>
-                    <Form >
-                        <div className="d-flex justify-content-end">
-                            <Button type="button" className="btn btn-primary me-2" >Edit</Button>
-                            <Button type="button" className="btn btn-primary me-2" >Add User</Button>
-                            <Button type="button" variant="danger" className="btn me-2">Delete</Button>
+                    <Form>
+                        <div className="mb-3">
+                            <strong>ID:</strong> {family.id}
                         </div>
-                             
+                        <div className="mb-3">
+                            <strong>Space Name:</strong>
+                            {isEditMode ? (
+                                <input
+                                    type="text"
+                                    value={editedSpaceName}
+                                    onChange={(e) => setEditedSpaceName(e.target.value)}
+                                    className="form-control mt-2"
+                                />
+                            ) : (
+                                ` ${family.spaceName}`
+                            )}
+                        </div>
+                        <div className="mb-3">
+                            <strong>Number of Users:</strong> {family.familyMembers ? family.familyMembers.length : "N/A"}
+                        </div>
+                        <div className="mb-3">
+                            <strong>Created At:</strong> {formattedCreatedAt}
+                        </div>
+                        <div className="mb-3">
+                            <strong>Updated At:</strong> {formattedUpdatedAt}
+                        </div>
                         
+                        <div className="d-flex justify-content-end">
+                            {isEditMode ? (
+                                <>
+                                    <Button onClick={handleSave} className="btn btn-success me-2">Save</Button>
+                                    <Button onClick={handleCancel} className="btn btn-secondary">Cancel</Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button onClick={handleEdit} className="btn btn-primary me-2">Edit</Button>
+                                    <Button variant="success" onClick={handleAddMemberShow} className="me-2">Add Member</Button>
+                                </>
+                            )}
+                        </div>
+                        {showAddMemberForm && (
+                        <Card className="mt-3">
+                            <Card.Header>Add New Family Member</Card.Header>
+                            <Card.Body>
+                            <Form onSubmit={handleAddMemberSubmit}>
+                                <Row className="align-items-center">
+                                {/* First Name */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>First Name</Form.Label>
+                                    <Form.Control
+                                    type="text"
+                                    name="firstName"
+                                    value={newMember.firstName}
+                                    onChange={handleAddMemberChange}
+                                    />
+                                </Form.Group>
+
+                                {/* Last Name */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>Last Name</Form.Label>
+                                    <Form.Control
+                                    type="text"
+                                    name="lastName"
+                                    value={newMember.lastName}
+                                    onChange={handleAddMemberChange}
+                                    />
+                                </Form.Group>
+
+                                {/* Username */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>Username</Form.Label>
+                                    <Form.Control
+                                    type="text"
+                                    name="userName"
+                                    value={newMember.userName}
+                                    onChange={handleAddMemberChange}
+                                    />
+                                </Form.Group>
+
+                                {/* Email */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>Email</Form.Label>
+                                    <Form.Control
+                                    type="email"
+                                    name="email"
+                                    value={newMember.email}
+                                    onChange={handleAddMemberChange}
+                                    />
+                                </Form.Group>
+
+                                {/* Password */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>Password</Form.Label>
+                                    <Form.Control
+                                    type="password"
+                                    name="password"
+                                    value={newMember.password}
+                                    onChange={handleAddMemberChange}
+                                    />
+                                </Form.Group>
+
+                                {/* Role */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>Role</Form.Label>
+                                    <Form.Select
+                                    name="role"
+                                    value={newMember.role}
+                                    onChange={handleAddMemberChange}
+                                    >
+                                    <option value="">Select a role</option>
+                                    <option value="parent">Parent</option>
+                                    <option value="child">Child</option>
+                                    </Form.Select>
+                                </Form.Group>
+
+                                {/* Gender */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>Gender</Form.Label>
+                                    <Form.Select
+                                    name="gender"
+                                    value={newMember.gender}
+                                    onChange={handleAddMemberChange}
+                                    >
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    </Form.Select>
+                                </Form.Group>
+
+                                {/* Date of Birth */}
+                                <Form.Group className="form-group col-sm-6">
+                                    <Form.Label>Date of Birth</Form.Label>
+                                    <Form.Control
+                                    type="date"
+                                    name="dateOfBirth"
+                                    value={newMember.dateOfBirth}
+                                    onChange={handleAddMemberChange}
+                                    />
+                                </Form.Group>
+                                </Row>
+
+                                <div className="d-flex justify-content-end mt-2">
+                                <Button type="submit" variant="primary" className="me-2">Add Member</Button>
+                                <Button variant="secondary" onClick={handleAddMemberHide}>Cancel</Button>
+                                </div>
+                            </Form>
+                            </Card.Body>
+                        </Card>
+                        )}
+
+                        
+
+
+
                     </Form>
-                       
-                
                 </Card.Body>
             </Card>
         </Tab.Pane>
-    )
+    );
 }
 
-function FamilyMember({member, updateUser}){
+  
+
+
+
+
+
+function FamilyMember({member, updateUser, deleteUser}){
   const [isEditMode, setIsEditMode] = useState(false); // Track edit mode
   const [editMember, setEditMember] = useState(member); // State for editing member
 
@@ -425,10 +601,8 @@ const handleSubmit = async (e) => {
     const payload = {
         ...editMember, // Spread the updated userInput fields
         currentUserName: uniqueIdentifier, // Use the unique identifier for the user being updated
-    };
-
+    }; 
     // console.log("Updating user with payload:", payload);
-
     try {
         // Call your updateUser mutation with the payload
         const result = await updateUser(payload).unwrap(); // Assuming your mutation is set up to accept and process this payload correctly
@@ -444,11 +618,20 @@ const handleSubmit = async (e) => {
     }
 };
 
-  // Placeholder for delete functionality
-  const handleDelete = () => {
-    // console.log('Delete member:', member.id);
-    // Here you would call your API to delete the member
+const handleDelete = async () => {
+    try {
+      await deleteUser({ userName: member.userName }).unwrap();
+      toast.success('Family member deleted successfully');
+    //   if (refetchFamily) refetchFamily(); // Call refetch if defined
+    } catch (error) {
+      toast.error(`Failed to delete family member: ${error.data?.message || 'An error occurred'}`);
+    }
   };
+
+
+
+
+
     return (
         <Tab.Pane eventKey="third" className="fade show">
             <Card>

@@ -29,7 +29,7 @@ const Notification = () => {
                   <h4 className="card-title mb-3">Notification</h4>
                </Col>
                <Col sm="12">
-                  <Card>
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -71,8 +71,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -113,8 +113,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -155,8 +155,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -197,8 +197,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -239,8 +239,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -281,8 +281,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -323,8 +323,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -365,8 +365,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -407,8 +407,8 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
-                  <Card>
+                  </Card> */}
+                  {/* <Card>
                      <Card.Body>
                         <ul className="notification-list m-0 p-0">
                            <li className="d-flex align-items-center justify-content-between">
@@ -659,7 +659,7 @@ const Notification = () => {
                            </li>
                         </ul>
                      </Card.Body>
-                  </Card>
+                  </Card> */}
                </Col>
             </Row>
             </Container>

@@ -6,12 +6,7 @@ const FAMILY_URL = '/api/auth/family'
 
 export const profileApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getFamilyMembers: builder.query({
-            query: ()=> ({
-                url: `${FAMILY_URL}`,
-                method: 'GET'
-            })
-        }),
+        
         getUserInfo: builder.query({
             query: ()=> ({
                 url: `${USER_URL}`,
@@ -32,6 +27,14 @@ export const profileApiSlice = apiSlice.injectEndpoints({
                 body: userData,
             }),
         }),
+        addFamilyMember: builder.mutation({
+            query: (memberData) => ({
+                url: `${USER_URL}`,
+                method: 'PUT',
+                body: memberData,
+            }),
+        }),
+
         changePassword: builder.mutation({
             query: ({ currentPassword, newPassword }) => ({
                 url: '/api/auth/change-password', // Adjust URL as necessary
@@ -39,8 +42,33 @@ export const profileApiSlice = apiSlice.injectEndpoints({
                 body: { currentPassword, newPassword },
             }),
         }),
+
+        getFamilyMembers: builder.query({
+            query: ()=> ({
+                url: `${FAMILY_URL}`,
+                method: 'GET'
+            })
+        }),
+        editFamilyProfile: builder.mutation({
+            query: (familyData) => ({
+                url: `${FAMILY_URL}`,
+                method: 'PUT',
+                body: familyData,
+            }),
+        }),
+        
+
+
         
     })
 });
 
-export const { useGetFamilyMembersQuery, useGetUserInfoQuery, useDeleteUserMutation, useUpdateUserMutation, useChangePasswordMutation } = profileApiSlice;
+export const { 
+    useGetFamilyMembersQuery, 
+    useGetUserInfoQuery, 
+    useDeleteUserMutation, 
+    useUpdateUserMutation, 
+    useChangePasswordMutation, 
+    useEditFamilyProfileMutation, 
+    useAddFamilyMemberMutation 
+} = profileApiSlice;
