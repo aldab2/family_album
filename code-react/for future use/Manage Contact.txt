@@ -1,0 +1,31 @@
+function ManageContact(){
+    return (
+        <Tab.Pane eventKey="fourth" className="fade show">
+                              <Card>
+                                  <Card.Header className="d-flex justify-content-between">
+                                  <div className="header-title">
+                                      <h4 className="card-title">Manage Contact</h4>
+                                  </div>
+                                  </Card.Header>
+                                  <Card.Body>
+                                      <Form>
+                                          <Form.Group className="form-group">
+                                              <Form.Label htmlFor="cno"  className="form-label">Contact Number:</Form.Label>
+                                              <Form.Control type="text" className="form-control" id="cno" defaultValue="001 2536 123 458"/>
+                                          </Form.Group>
+                                          <Form.Group className="form-group">
+                                              <Form.Label htmlFor="email"  className="form-label">Email:</Form.Label>
+                                              <Form.Control type="email" className="form-control" id="email" defaultValue="Bnijone@demo.com"/>
+                                          </Form.Group>
+                                          <Form.Group className="form-group">
+                                              <Form.Label htmlFor="url"  className="form-label">Url:</Form.Label>
+                                              <Form.Control type="text" className="form-control" id="url" defaultValue="https://getbootstrap.com"/>
+                                          </Form.Group>
+                                          <Button type="submit" className="btn btn-primary me-2">Submit</Button>
+                                          <Button type="reset" className="btn bg-soft-danger">Cancel</Button>
+                                      </Form>
+                                  </Card.Body>
+                              </Card>
+                          </Tab.Pane>
+    )
+}
