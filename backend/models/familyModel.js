@@ -13,7 +13,6 @@ const familySchema = mongoose.Schema({
     friends: [{
         type: mongoose.Types.ObjectId,
         ref: 'Family',
-        unique: true
     }]
 },{
     timestamps:true

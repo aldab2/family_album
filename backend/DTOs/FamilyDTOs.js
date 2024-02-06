@@ -7,7 +7,6 @@ class FamilyReadDTO {
       this.spaceName = family.spaceName;
       // Assuming you want to convert the family members' ObjectIds to user DTOs
       this.familyMembers = family.familyMembers.map(member => new UserReadDTO(member));
-      this.friendRequests = family.friendRequests
       // this.friendRequests = family.friendRequests.map(request => new UserReadDTO(request));
       // Include timestamps
       this.createdAt = family.createdAt;

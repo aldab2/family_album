@@ -2,19 +2,19 @@ import mongoose from "mongoose";
 import bcrypt from 'bcryptjs';
 
 const friendRequestSchema = mongoose.Schema({
-    senderFirstName:{
-        type: String,
-        required: true
-    },
-    senderSpaceName:{
-        type: String,
-        required: true
-    },
-    senderFamilyId: {
+    // senderFirstName:{
+    //     type: String,
+    //     required: true
+    // },
+    // senderSpaceName:{
+    //     type: String,
+    //     required: true
+    // },
+    senderFamily: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Family'
     },
-    recipientFamilyId:{
+    recipientFamily:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Family'
     },
