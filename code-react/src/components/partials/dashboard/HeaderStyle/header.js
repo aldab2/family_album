@@ -281,9 +281,9 @@ const Header = () => {
                         </div>
                       </div>
 
-                      <div className="d-flex align-items-center iq-sub-card">
+                      <div className="d-flex align-items-center iq-sub-card"  onClick={logoutHandler}>
                         <span className="material-symbols-outlined">login</span>
-                        <div className="ms-3" onClick={logoutHandler}>
+                        <div className="ms-3">
                          {/*  <Link to="/auth/sign-in" className="mb-0 h6">
                             Sign out
                           </Link> */}

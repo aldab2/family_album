@@ -1,6 +1,6 @@
-import React from 'react'
-import {Row,Col,Container,Image,Button} from 'react-bootstrap'
-import {Link, useNavigate} from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import {Form,Row,Col,Container,Image,Button, Card} from 'react-bootstrap'
+import { Link, useNavigate} from 'react-router-dom'
 
 
 //swiper
@@ -13,16 +13,97 @@ import 'swiper/swiper-bundle.min.css'
 
 //image
 import mail from '../../../assets/images/login/mail.png'
-import logo from '../../../assets/images/logo-full.png'
+import logo from '../../../assets/images/tmp-logo.png'
 import login1 from '../../../assets/images/login/1.png'
 import login2 from '../../../assets/images/login/2.png'
 import login3 from '../../../assets/images/login/3.png'
+import { useDispatch, useSelector } from 'react-redux';
+import { useActivateUserMutation, useLazySendVerificationCodeQuery } from '../../../store/slices/usersApiSlice';
+import { toast } from 'react-toastify';
+import { setCredentials } from '../../../store/slices/authSlice';
 
 // install Swiper modules
 SwiperCore.use([Navigation, Autoplay]);
+const RESEND_TIMER_SECS = 5;
+const ActivateAccount = () => {
+    const [activationCode, setActivationCode] = useState('');
+    const [timer, setTimer] = useState(RESEND_TIMER_SECS);
+    const navigate = useNavigate();
+   const dispatch = useDispatch();
 
-const ConfirmMail = () => {
-   let history =useNavigate()
+
+   const { userInfo } = useSelector(state => state.authReducer) || {};
+
+   const [activateUser, { isLoading: isActivatingUser,error:activateUserError }] = useActivateUserMutation();
+   const [sendVerificationCode, { isLoading: isSendingVerificationCode,error:sendVerificationCodeError }] = useLazySendVerificationCodeQuery();
+ 
+
+   useEffect(() => {
+      if (userInfo && userInfo.active) {
+         navigate('/')
+      }
+      else if (!userInfo){
+        navigate('/auth/sign-in')
+      }
+      else {
+
+        
+        sendVerificationCode();
+
+        
+      }
+   }, [navigate, userInfo])
+
+   useEffect(()=>{
+    if(sendVerificationCodeError){
+    toast.error(sendVerificationCodeError.data?.message || sendVerificationCodeError.error)
+    
+    }
+       
+   },[sendVerificationCodeError])
+
+   useEffect(()=>{
+    if(activateUserError){
+        toast.error(activateUserError.data?.message ||  activateUserError.error)
+    }
+    
+   },[activateUserError])
+
+   // Function to start the OTP send process and countdown
+  const sendActivationCode = async () => {
+    // Call your OTP sending function here
+    setTimer(RESEND_TIMER_SECS);
+    await sendVerificationCode();
+    
+  };
+
+    // Effect hook to handle the countdown
+    useEffect(() => {
+        let interval = null;
+    
+        if (timer > 0) {
+          interval = setInterval(() => {
+            setTimer(timer - 1);
+          }, 1000);
+        }
+    
+        return () => clearInterval(interval);
+      }, [timer]);
+
+
+      const handleActivateButton = async()=>{
+
+        try{
+            const user = await activateUser({code:activationCode}).unwrap();
+            dispatch(setCredentials({ ...user }))
+        }
+        catch(err){
+            //toast.err(err)
+        }
+        
+
+      }
+
    return (
         <>
             <section className="sign-in-page">
@@ -68,21 +149,32 @@ const ConfirmMail = () => {
                             </div>
                         </Col>
                         <Col md="6" className="bg-white pt-5 pt-5 pb-lg-0 pb-5">
-                            <div className="sign-in-from">
-                                <Image src={mail} width="80"  alt=""/>
-                                <h1 className="mt-3 mb-0">Success !</h1>
-                                <p>A email has been send to youremail@domain.com. Please check for an email from company and click on the included link to reset your password.</p>
-                                <div className="d-inline-block w-100">
-                                    <Button type="button"  onClick={() => history.push('/')} variant="primary" className="mt-3">
-                                        <span className="d-flex align-items-center">
-                                            <i className="material-symbols-outlined md-18 me-1">
-                                            home
-                                            </i>
-                                            Back to Home
-                                        </span>    
-                                    </Button>
-                                </div>
-                            </div>
+                        <Card>
+      <Card.Header className="d-flex justify-content-between">
+        <div className="header-title">
+          <h4 className="card-title">OTP Verification</h4>
+        </div>
+      </Card.Header>
+      <Card.Body>
+        <p>Please enter the Activation code sent to your email.</p>
+        
+
+        {timer != 0 && <p>You can resend the code in {timer} seconds</p>}
+        {timer == 0 && <p className="text-primary" style={{ cursor: 'pointer' }} onClick={sendActivationCode}>
+              Resend Activation Code
+            </p>}
+        <Form>
+          <Form.Group className="form-group">
+            <Form.Label>Activation Code:</Form.Label>
+            <Form.Control type="number" value={activationCode} onChange={(e) => setActivationCode(e.target.value)} maxLength="6" />
+          </Form.Group>
+
+          <Button variant="primary" onClick={() => handleActivateButton()} >Activate Account</Button>{' '}
+          
+          
+        </Form>
+      </Card.Body>
+    </Card>
                         </Col>
                     </Row>
                 </Container>
@@ -91,4 +183,4 @@ const ConfirmMail = () => {
     )
 }
 
-export default ConfirmMail;
+export default ActivateAccount;
