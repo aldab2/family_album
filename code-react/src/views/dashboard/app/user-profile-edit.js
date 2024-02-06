@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useGetUserInfoQuery, useUpdateUserMutation, useChangePasswordMutation, useDeleteUserMutation, useAddFamilyMemberMutation  } from '../../../store/slices/profileApiSlice';
 import {useGetFamilyMembersQuery, useEditFamilyProfileMutation } from '../../../store/slices/profileApiSlice';
-
+import ConfirmModal from './ConfirmModal';
 
 
 
@@ -371,6 +371,7 @@ function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMemb
     const handleAddMemberChange = (e) => {
         const { name, value } = e.target;
         setNewMember({ ...newMember, [name]: value });
+        console.log("to add", newMember)
     };
     const handleAddMemberSubmit = async (e) => {
         e.preventDefault(); // Prevent form from causing page reload
@@ -378,7 +379,6 @@ function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMemb
             // Adjust the payload as per your API's expectations
             await addFamilyMember({
                 ...newMember,
-                familyId: family.id, // Assuming your API needs a family ID
             }).unwrap();
             toast.success('Family member added successfully!');
             handleAddMemberHide(); // Hide the add member form
@@ -452,7 +452,7 @@ function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMemb
                         <Card className="mt-3">
                             <Card.Header>Add New Family Member</Card.Header>
                             <Card.Body>
-                            <Form onSubmit={handleAddMemberSubmit}>
+                            <Card >
                                 <Row className="align-items-center">
                                 {/* First Name */}
                                 <Form.Group className="form-group col-sm-6">
@@ -519,6 +519,7 @@ function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMemb
                                     >
                                     <option value="">Select a role</option>
                                     <option value="parent">Parent</option>
+                                    <option value="adult">Adult</option>
                                     <option value="child">Child</option>
                                     </Form.Select>
                                 </Form.Group>
@@ -550,17 +551,13 @@ function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMemb
                                 </Row>
 
                                 <div className="d-flex justify-content-end mt-2">
-                                <Button type="submit" variant="primary" className="me-2">Add Member</Button>
+                                <Button type="submit" variant="primary" className="me-2" onClick={handleAddMemberSubmit}>Add Member</Button>
                                 <Button variant="secondary" onClick={handleAddMemberHide}>Cancel</Button>
                                 </div>
-                            </Form>
+                            </Card>
                             </Card.Body>
                         </Card>
                         )}
-
-                        
-
-
 
                     </Form>
                 </Card.Body>
@@ -578,7 +575,7 @@ function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMemb
 function FamilyMember({member, updateUser, deleteUser}){
   const [isEditMode, setIsEditMode] = useState(false); // Track edit mode
   const [editMember, setEditMember] = useState(member); // State for editing member
-
+  const [showConfirm, setShowConfirm] = useState(false);
   // Handle edit mode toggle
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode);
@@ -618,15 +615,30 @@ const handleSubmit = async (e) => {
     }
 };
 
-const handleDelete = async () => {
-    try {
-      await deleteUser({ userName: member.userName }).unwrap();
-      toast.success('Family member deleted successfully');
-    //   if (refetchFamily) refetchFamily(); // Call refetch if defined
-    } catch (error) {
-      toast.error(`Failed to delete family member: ${error.data?.message || 'An error occurred'}`);
-    }
-  };
+
+
+const handleDelete = async (userNameToDelete) => {
+    // Display a confirmation dialog to the user
+    // const isConfirmed = window.confirm(`Are you sure you want to delete the user ${userNameToDelete}?`);
+
+    // Proceed only if the user confirmed the action
+    // if (isConfirmed) {
+        // console.log("The user to delete is:", userNameToDelete);
+
+        try {
+            await deleteUser({ userName: member.userName }).unwrap();
+            toast.success("Family member deleted successfully");
+        } catch (error) {
+            toast.error(`Failed to delete family member: ${error.data?.message || 'An error occurred'}`);
+        } finally {
+            setShowConfirm(false); // Ensure the modal is closed after operation
+         }
+    
+    //else {
+    //     // User clicked 'Cancel', do not proceed with deletion
+    //     console.log("User deletion cancelled")
+};
+
 
 
 
@@ -643,9 +655,18 @@ const handleDelete = async () => {
                 <Card.Body>
                     <Form onSubmit={handleSubmit}>
                         <div className="d-flex justify-content-end">
-                            <Button type="button" className="btn btn-primary me-2" onClick={toggleEditMode} >Edit</Button>
-                            <Button variant="danger" onClick={handleDelete} className="ms-2">Delete</Button>
+                            <Button type="button" className="btn btn-primary me-2 edit-button" onClick={toggleEditMode}>Edit</Button>
+                            <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                            
+                            <ConfirmModal
+                                show={showConfirm}
+                                onHide={() => setShowConfirm(false)}
+                                onConfirm={handleDelete}
+                                message={`Are you sure you want to delete ${member.userName}?`}
+                            />
                         </div>
+                        
+                        
                             
                         <Row className="align-items-center">
                             <Form.Group className="form-group col-sm-6">
@@ -755,6 +776,19 @@ const handleDelete = async () => {
                                 <option value="child">Child</option>
                                 <option value="adult">Adult</option>
                             </Form.Select>
+                            </Form.Group>
+
+                            <Form.Group className="form-group col-sm-6">
+                            <Form.Label htmlFor={`${member.id}-active`} className="form-label">Active</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                className="form-control" 
+                                id={`${member.id}-active`}
+                                name="dateOfBirth"
+                                value={editMember.active ? "Yes" : "No"} 
+                                 
+                                readOnly={true}
+                            />
                             </Form.Group>
                                 
                             </Row>

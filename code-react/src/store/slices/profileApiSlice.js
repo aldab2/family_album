@@ -30,7 +30,7 @@ export const profileApiSlice = apiSlice.injectEndpoints({
         addFamilyMember: builder.mutation({
             query: (memberData) => ({
                 url: `${USER_URL}`,
-                method: 'PUT',
+                method: 'POST',
                 body: memberData,
             }),
         }),
