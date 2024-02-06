@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import ConfirmModal from './ConfirmModal';
 
-export function FamilyMember({ member, updateUser, deleteUser }) {
+export function FamilyMember({ member, updateUser, deleteUser, onSetFamily }) {
     const [isEditMode, setIsEditMode] = useState(false); // Track edit mode
     const [editMember, setEditMember] = useState(member); // State for editing member
     const [showConfirm, setShowConfirm] = useState(false);
@@ -58,8 +58,13 @@ export function FamilyMember({ member, updateUser, deleteUser }) {
         // console.log("The user to delete is:", userNameToDelete);
         try {
             await deleteUser({ userName: member.userName }).unwrap();
+            // onSetFamily((family) => family.familyMembers.filter((member) => member.userName!==userNameToDelete) )
+
+
             toast.success("Family member deleted successfully");
+
         } catch (error) {
+            console.log(error)
             toast.error(`Failed to delete family member: ${error.data?.message || 'An error occurred'}`);
         } finally {
             setShowConfirm(false); // Ensure the modal is closed after operation

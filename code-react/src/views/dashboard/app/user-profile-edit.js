@@ -19,7 +19,7 @@ const UserProfileEdit =() =>{
 
     const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
     const { data: userInfo, refetch } = useGetUserInfoQuery();
-    const { data: family, isLoading, isError, error } = useGetFamilyMembersQuery();
+    const { data: familyQueryResult, isLoading, isError, error } = useGetFamilyMembersQuery();
     const [editFamilyProfile, { isLoading: isEditing }] = useEditFamilyProfileMutation();
     const [addFamilyMember, { isLoading: isAdding }] = useAddFamilyMemberMutation();
 
@@ -28,14 +28,10 @@ const UserProfileEdit =() =>{
     // const { userInfo } = useSelector(state => state.userReducer) || {};
     // console.log("userinfo=", userInfo)
 
+    const [family, setFamily] = useState([])
     const [userInput, setUserInput] = useState({...userInfo});
     const [updateUser, { isLoading2, isSuccess2, isError2, error2 }] = useUpdateUserMutation();
     
-    // useEffect(() => {
-    //     console.log(userInfo, userInput)
-    //     // setUserInput({...userInfo});
-            
-    // }, [userInfo, userInput]);
 
     useEffect(() => {
         if (userInfo) {
@@ -44,7 +40,12 @@ const UserProfileEdit =() =>{
         }
     }, [userInfo]); // Remove 'userInput' from dependency array
     
-
+    useEffect(() => {
+        if (familyQueryResult) {
+            //console.log("UserInfo updated:", userInfo);
+            setFamily({ ...familyQueryResult });
+        }
+    }, [familyQueryResult]); // Remove 'userInput' from dependency array
   return(
       <>
         <Container>
@@ -91,7 +92,7 @@ const UserProfileEdit =() =>{
                         </Tab.Pane>
 
                         <Tab.Pane eventKey="third" className="fade show">
-                          <FamilyInfo family= {family} editFamilyProfile={editFamilyProfile} addFamilyMember ={addFamilyMember}  />
+                          <FamilyInfo family= {family} onSetFamily = {setFamily} editFamilyProfile={editFamilyProfile} addFamilyMember ={addFamilyMember}  />
                         </Tab.Pane>
                         <Tab.Pane eventKey="third" className="fade show">
                           {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = {deleteUser} />)}
