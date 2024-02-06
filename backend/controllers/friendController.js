@@ -96,7 +96,7 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
     const friendRequest = await FriendReqest.findOne({ _id: id, recipientFamily: recipientFamilyId });
     if (!friendRequest) {
       res.status(404)
-      throw new Error("Friend request not found.")
+      throw new Error("Friend request not found or you are not authorized to accept the reqest.")
     }
     // error source will unknow if removed 
     // Check if the friend request is intended for the recipient
@@ -146,7 +146,7 @@ const rejectFriendRequest  = asyncHandler(async (req, res) => {
     const friendRequest = await FriendReqest.findOne({ _id: id, recipientFamily: recipientFamilyId });
     if (!friendRequest) {
       res.status(404);
-      throw new Error("Friend request not found.");
+      throw new Error("Friend request not found or you are not authorized to reject.");
     }
 
     // Removing this is only efficient in terms of there being less lines of code, but now we don't get as useful error messages.
@@ -186,28 +186,27 @@ const removeFamilyFriend = async (req, res) => {
   } = req.body
 
   try {
-    const selfFamily = await Family.findOne({ _id: req.user.family })
-    const removalFamily = await Family.findOne({ _id: toRemoveId })
+    const selfFamily = await Family.findOne({ _id: req.user.family });
+    const removalFamily = await Family.findOne({ _id: toRemoveId });
 
   
     
-    let selfTargetIndex = selfFamily.friends.indexOf(toRemoveId)
+    let selfTargetIndex = selfFamily.friends.indexOf(toRemoveId);
     if (selfTargetIndex >= 0) {
-      selfFamily.friends.splice(selfTargetIndex, 1)
-      await selfFamily.save()
+      selfFamily.friends.splice(selfTargetIndex, 1);
+      await selfFamily.save();
     }
-    let removalTargetIndex = removalFamily.friends.indexOf(req.user.family)
+    let removalTargetIndex = removalFamily.friends.indexOf(req.user.family);
     if (removalTargetIndex >= 0) {
-      removalFamily.friends.splice(removalTargetIndex, 1)
-      await removalFamily.save()
+      removalFamily.friends.splice(removalTargetIndex, 1);
+      await removalFamily.save();
     }
 
-    //CORRECT?
   
-    res.json(removalFamily)
+    res.status(200).json(removalFamily);
 
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500);
     throw new Error(error);
   }
