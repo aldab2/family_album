@@ -12,7 +12,7 @@ const familySchema = mongoose.Schema({
     }],
     friends: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Family'
+        ref: 'Family',
     }]
 },{
     timestamps:true
