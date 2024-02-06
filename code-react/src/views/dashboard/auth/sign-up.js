@@ -25,7 +25,7 @@ import { setCredentials } from '../../../store/slices/authSlice';
 SwiperCore.use([Navigation, Autoplay]);
 
 const SignUp = () => {
-   const [spaceName, setSpaceName] = useState('');
+    const [spaceName, setSpaceName] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [userName, setUserName] = useState('');

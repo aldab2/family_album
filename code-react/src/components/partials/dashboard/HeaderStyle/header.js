@@ -35,6 +35,7 @@ import { clearCredentials } from "../../../../store/slices/authSlice";
 // import DropdownMenu from "react-bootstrap/esm/DropdownMenu";
 
 const Header = () => {
+  
   const minisidebar = () => {
     document.getElementsByTagName("ASIDE")[0].classList.toggle("sidebar-mini");
   };
@@ -235,14 +236,14 @@ const Header = () => {
                     loading="lazy"
                   /> */}
                   <div className="caption d-none d-lg-block">
-                    <h6 className="mb-0 line-height">Bni Cyst</h6>
+                    <h6 className="mb-0 line-height">{userInfo.firstName + " " + userInfo.lastName}</h6>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="sub-drop caption-menu">
                   <Card className="shadow-none m-0">
                     <Card.Header>
                       <div className="header-title">
-                        <h5 className="mb-0 ">Hello Bni Cyst</h5>
+                        <h5 className="mb-0 ">{"Hello " + userInfo.firstName + " " + userInfo.lastName}</h5>
                       </div>
                     </Card.Header>
                     <Card.Body className="p-0 ">
@@ -261,7 +262,7 @@ const Header = () => {
                           edit_note
                         </span>
                         <div className="ms-3">
-                          <Link to="#" className="mb-0 h6">
+                          <Link to="/dashboard/app/user-profile-edit" className="mb-0 h6">
                             Edit Profile
                           </Link>
                         </div>
