@@ -197,12 +197,17 @@ const editFamilyMember = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ userName: userUpdateDTO.currentUserName, family: req.user.family });
   if (user) {
+    if (user.role === userUpdateDTO.role) {
+      // Role provided but it's the same as the current one, so no error should be thrown.
+      delete userUpdateDTO.role; // Ignore the role in the update as it's unchanged.
+    }
 
     // if the role was provided and the user is initially a perent throw error because parent role cannot be changed
     if (user.role === 'parent' && userUpdateDTO.role) {
       res.status(400);
       throw new Error(`parent role cannot be changed`);
     }
+    
     // child and adult roles cannot be changed to parent role
     if ((user.role === 'child' || user.role === 'adult') && userUpdateDTO.role === 'parent') {
       res.status(400);
@@ -339,7 +344,7 @@ const verifyCode = asyncHandler(async (req, res) => {
     const user = await User.findOne({userName: req.user.userName});
     user.active = true;
     await user.save();
-    res.status(200).json({message:"User activated"})
+    res.status(200).json(new UserReadDTO(user))
   } else {
     res.status(400)
     throw new Error("VerificationCode does not match.")
