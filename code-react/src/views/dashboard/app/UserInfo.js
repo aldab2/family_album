@@ -42,7 +42,6 @@ export function UserInfo({ userInput, onUserInput, userInfo, updateUser, refetch
         try {
             await updateUser(payload).unwrap();
             toast.success('User updated successfully!');
-            // refetch();
             onUserInput({ ...userInput });
             setIsEditMode(false); // Exit edit mode on successful update
         } catch (err) {

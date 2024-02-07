@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import ConfirmModal from './ConfirmModal';
 
-export function FamilyMember({ member, updateUser, deleteUser, onSetFamily }) {
+export function FamilyMember({ member, updateUser, deleteUser, family, onSetFamily }) {
     const [isEditMode, setIsEditMode] = useState(false); // Track edit mode
     const [editMember, setEditMember] = useState(member); // State for editing member
     const [showConfirm, setShowConfirm] = useState(false);
@@ -49,7 +49,6 @@ export function FamilyMember({ member, updateUser, deleteUser, onSetFamily }) {
     };
 
 
-
     const handleDelete = async (userNameToDelete) => {
         // Display a confirmation dialog to the user
         // const isConfirmed = window.confirm(`Are you sure you want to delete the user ${userNameToDelete}?`);
@@ -58,15 +57,17 @@ export function FamilyMember({ member, updateUser, deleteUser, onSetFamily }) {
         // console.log("The user to delete is:", userNameToDelete);
         try {
             await deleteUser({ userName: member.userName }).unwrap();
-            // onSetFamily((family) => family.familyMembers.filter((member) => member.userName!==userNameToDelete) )
-
-
             toast.success("Family member deleted successfully");
-
+            onSetFamily((family) => ({
+                ...family,
+                familyMembers: family.familyMembers.filter((member) => member.userName !== userNameToDelete)
+              }));
+            
         } catch (error) {
             console.log(error)
             toast.error(`Failed to delete family member: ${error.data?.message || 'An error occurred'}`);
         } finally {
+            
             setShowConfirm(false); // Ensure the modal is closed after operation
         }
 

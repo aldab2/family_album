@@ -95,7 +95,7 @@ const UserProfileEdit =() =>{
                           <FamilyInfo family= {family} onSetFamily = {setFamily} editFamilyProfile={editFamilyProfile} addFamilyMember ={addFamilyMember}  />
                         </Tab.Pane>
                         <Tab.Pane eventKey="third" className="fade show">
-                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = {deleteUser} />)}
+                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = {deleteUser} family={family} onSetFamily={setFamily}/>)}
                         </Tab.Pane>
 
                           {/* <ManageContact />    */}
