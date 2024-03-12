@@ -115,8 +115,8 @@ const getPost = asyncHandler(async (req, res) => {
     let query = {};
 
     // Check for 'userId' filter
-    if (req.query.onlyMyPosts === 'true') {
-        query.userId = req.query.userId;
+    if (req.query.onlyMyPosts == 'true') {
+        query.userId = req.user.id;
     }
 
     // Check for 'postId' filter

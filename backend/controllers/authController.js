@@ -234,12 +234,17 @@ const editFamilyMember = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ userName: userUpdateDTO.currentUserName, family: req.user.family });
   if (user) {
+    if (user.role === userUpdateDTO.role) {
+      // Role provided but it's the same as the current one, so no error should be thrown.
+      delete userUpdateDTO.role; // Ignore the role in the update as it's unchanged.
+    }
 
     // if the role was provided and the user is initially a perent throw error because parent role cannot be changed
     if (user.role === 'parent' && userUpdateDTO.role) {
       res.status(400);
       throw new Error(`parent role cannot be changed`);
     }
+    
     // child and adult roles cannot be changed to parent role
     if ((user.role === 'child' || user.role === 'adult') && userUpdateDTO.role === 'parent') {
       res.status(400);
@@ -299,36 +304,64 @@ const editFamilyMember = asyncHandler(async (req, res) => {
  * @route DELETE /api/auth/user
  * @access Private
  * @type {import("express").RequestHandler} */
+// const deleteFamilyMember = asyncHandler(async (req, res) => {
+//   const { userName } = req.body;
+
+//   const user = await User.findOne({ userName: userName, family: req.user.family });
+//   if(user){
+//     if(user.userName === userName){
+//       res.status(400);
+//       throw new Error("Cannot delete your account");
+//     }
+//     if(user.role === 'parent'){
+
+//       res.status(400);
+//       throw new Error("Cannot delete another parent");
+//     }
+
+//     const family = await Family.findOneAndUpdate({ _id: req.user.family }, { $pull: { familyMembers: user._id } },
+//       { new: true } // Ensure you get the updated family document
+//     ).populate('familyMembers');
+//     const familyReadDTO = new FamilyReadDTO(family);
+//     await User.deleteOne({ userName });
+
+//     res.status(204).json(familyReadDTO)
+
+//   }
+//   else {
+//     res.status(400);
+//     throw new Error(`User ${userName} was not found in your family`);
+//   }
+
+// });
 const deleteFamilyMember = asyncHandler(async (req, res) => {
-  const { userName } = req.body;
+  const { userName } = req.body; // userName of the user to delete
+  const currentUser = req.user; // Assuming `req.user` contains the current user's info
 
-  const user = await User.findOne({ userName: userName, family: req.user.family });
-  if(user){
-    if(user.userName === userName){
-      res.status(400);
-      throw new Error("Cannot delete your account");
-    }
-    if(user.role === 'parent'){
-
-      res.status(400);
-      throw new Error("Cannot delete another parent");
-    }
-
-    const family = await Family.findOneAndUpdate({ _id: req.user.family }, { $pull: { familyMembers: user._id } },
-      { new: true } // Ensure you get the updated family document
-    ).populate('familyMembers');
-    const familyReadDTO = new FamilyReadDTO(family);
-    await User.deleteOne({ userName });
-
-    res.status(204).json(familyReadDTO)
-
-  }
-  else {
-    res.status(400);
-    throw new Error(`User ${userName} was not found in your family`);
+  // Prevent users from deleting their own account via this route
+  if (userName === currentUser.userName) {
+    return res.status(400).json({ message: "Cannot delete your own account" });
   }
 
+  const userToDelete = await User.findOne({ userName: userName, family: currentUser.family });
+
+  if (!userToDelete) {
+    return res.status(404).json({ message: `User ${userName} not found in your family` });
+  }
+
+  // Additional checks, e.g., prevent deleting other parents, if applicable
+  if (userToDelete.role === 'parent' && currentUser.role !== 'admin') {
+    return res.status(403).json({ message: "Cannot delete another parent" });
+  }
+
+  // Proceed with user deletion
+  await Family.updateOne({ _id: currentUser.family }, { $pull: { familyMembers: userToDelete._id } });
+  await User.deleteOne({ _id: userToDelete._id });
+
+  res.status(204).send(); // No content to send back
 });
+
+
 
 
 /**
@@ -376,7 +409,7 @@ const verifyCode = asyncHandler(async (req, res) => {
     const user = await User.findOne({userName: req.user.userName});
     user.active = true;
     await user.save();
-    res.status(200).json({message:"User activated"})
+    res.status(200).json(new UserReadDTO(user))
   } else {
     res.status(400)
     throw new Error("VerificationCode does not match.")

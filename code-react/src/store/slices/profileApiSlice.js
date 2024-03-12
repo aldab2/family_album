@@ -6,12 +6,7 @@ const FAMILY_URL = '/api/auth/family'
 
 export const profileApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getFamilyMembers: builder.query({
-            query: ()=> ({
-                url: `${FAMILY_URL}`,
-                method: 'GET'
-            })
-        }),
+        
         getUserInfo: builder.query({
             query: ()=> ({
                 url: `${USER_URL}`,
@@ -25,8 +20,55 @@ export const profileApiSlice = apiSlice.injectEndpoints({
                 body:data
             })
         }),
+        updateUser: builder.mutation({
+            query: (userData) => ({
+                url: `${USER_URL}`,
+                method: 'PUT', // or 'PUT', depending on how your API is implemented
+                body: userData,
+            }),
+        }),
+        addFamilyMember: builder.mutation({
+            query: (memberData) => ({
+                url: `${USER_URL}`,
+                method: 'POST',
+                body: memberData,
+            }),
+        }),
+
+        changePassword: builder.mutation({
+            query: ({ currentPassword, newPassword }) => ({
+                url: '/api/auth/change-password', // Adjust URL as necessary
+                method: 'PUT',
+                body: { currentPassword, newPassword },
+            }),
+        }),
+
+        getFamilyMembers: builder.query({
+            query: ()=> ({
+                url: `${FAMILY_URL}`,
+                method: 'GET'
+            })
+        }),
+        editFamilyProfile: builder.mutation({
+            query: (familyData) => ({
+                url: `${FAMILY_URL}`,
+                method: 'PUT',
+                body: familyData,
+            }),
+        }),
+        
+
+
         
     })
 });
 
-export const { useGetFamilyMembersQuery, useGetUserInfoQuery, useDeleteUserMutation } = profileApiSlice;
+export const { 
+    useGetFamilyMembersQuery, 
+    useGetUserInfoQuery, 
+    useDeleteUserMutation, 
+    useUpdateUserMutation, 
+    useChangePasswordMutation, 
+    useEditFamilyProfileMutation, 
+    useAddFamilyMemberMutation 
+} = profileApiSlice;
