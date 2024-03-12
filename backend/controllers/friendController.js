@@ -26,13 +26,22 @@ const getFriendRequests = asyncHandler(async (req, res) => {
 const sendFriendRequest = asyncHandler(async (req, res) => {
 
     const senderFamilyId = req.user.family
-    // const senderFirstName = req.user.firstName
+    // const senderFirstName = req.user.firstNamec
     const senderFamily = await Family.findOne({ _id: senderFamilyId })
+    
     // const senderSpaceName = senderFamily.spaceName
     const {
-      recipientFamilyId
+      recipientspaceName
+
     } = req.body
+    const recipientFamily = await Family.findOne({ spaceName: recipientspaceName })
+    const recipientFamilyId = recipientFamily._id
+    
   
+    if(!recipientFamilyId){
+      res.status(404);
+      throw new Error("Recipient Family not found")
+    }
     // If trying to add self
     if (senderFamilyId.equals(recipientFamilyId)) {
       res.status(400);
@@ -48,14 +57,12 @@ const sendFriendRequest = asyncHandler(async (req, res) => {
 
     const newFriendRequest = new FriendReqest({
       senderFamily,
-      // senderFirstName,
-      // senderSpaceName,
-      recipientFamily: recipientFamilyId
+      recipientFamily
     })
 
     try {
       await newFriendRequest.save()
-      res.send("Success")
+      res.send(newFriendRequest)
     } catch (error) {
       console.log(error)
       res.status(500);
@@ -98,14 +105,7 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
       res.status(404)
       throw new Error("Friend request not found or you are not authorized to accept the reqest.")
     }
-    // error source will unknow if removed 
-    // Check if the friend request is intended for the recipient
-    // if (!recipientFamilyId.equals(friendRequest.recipientFamily)) {
-    //   return res.status(401).json({
-    //     message: "This friend request is not for you",
-    //     recipientFamilyId
-    //   });
-    // }
+   
     
     const [recipientFamily, senderFamily] = await Promise.all([
       Family.findOne({ _id: recipientFamilyId }),
@@ -149,14 +149,6 @@ const rejectFriendRequest  = asyncHandler(async (req, res) => {
       throw new Error("Friend request not found or you are not authorized to reject.");
     }
 
-    // Removing this is only efficient in terms of there being less lines of code, but now we don't get as useful error messages.
-    // Check if the friend request is intended for the recipient
-    // if (!recipientFamilyId.equals(friendRequest.recipientFamilyId)) {
-    //   return res.status(401).json({
-    //     message: "This friend request is not for you",
-    //     recipientFamilyId
-    //   });
-    // }
 
     // Update the friend request status to 'rejected'
     await FriendReqest.findOneAndUpdate({ _id: id }, { status: 'rejected' });
@@ -171,7 +163,7 @@ const rejectFriendRequest  = asyncHandler(async (req, res) => {
 
 const getFamilyFriends = async (req, res) => {
   try {
-    const friends = await Family.find({ _id: req.user.family }).populate('friends')
+    const friends = await Family.find({ _id: req.user.family }).populate('friends').populate('familyMembers')
     res.json(friends)
   } catch (error) {
     console.log(error)
