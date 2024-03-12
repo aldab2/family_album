@@ -57,7 +57,7 @@ const sendVerificationEmail = (req, res, next) => {
         <div class="email-container">
             <div class="header">
                 <!-- Logo Image -->
-                <img src="https://53.fs1.hubspotusercontent-na1.net/hub/53/hubfs/image8-2.jpg?width=893&height=600&name=image8-2.jpg" alt="Logo" class="logo">
+                <img src="https://github.com/aldab2/family_space/blob/main/frontend/src/logo.png?raw=true" alt="Logo" class="logo">
                 <h2>Welcome to Family Space!</h2>
             </div>
             <div class="content">

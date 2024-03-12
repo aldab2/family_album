@@ -10,10 +10,12 @@ import {login,
     changePassword,
     deleteFamilyMember,
     editFamilyMember,
-    verifyCode
+    verifyCode,
+    getNewVerificationCode
 }  from '../controllers/authController.js';
 import { sendVerificationEmail } from '../utils/emailUtils.js';
-import { protect } from '../middleware/authMidleware.js';
+import { protect, isParent } from '../middleware/authMiddleware.js';
+
 
 const router = express.Router();
 
@@ -31,5 +33,7 @@ router.route('/user')
     .delete(protect,deleteFamilyMember)
 router.put('/change-password',protect,changePassword)
 router.post('/logout',logoutUser);
+router.put('/editFamilyProfile', protect,isParent, editFamilyProfile)
+router.get('/getVerificationCode', protect, getNewVerificationCode)
 
 export default router;
