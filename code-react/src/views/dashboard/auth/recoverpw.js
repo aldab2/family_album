@@ -12,7 +12,7 @@ import 'swiper/swiper-bundle.min.css'
 // import 'swiper/components/navigation/navigation.scss';
 
 // img
-import logo from '../../../assets/images/logo-full.png'
+import logo from '../../../assets/images/tmp-logo.png'
 import login1 from '../../../assets/images/login/1.png'
 import login2 from '../../../assets/images/login/2.png'
 import login3 from '../../../assets/images/login/3.png'
@@ -49,17 +49,17 @@ const Recoverpw = () => {
                                         className="list-inline m-0 p-0">
                                         <SwiperSlide>
                                             <Image src={login1} className="img-fluid mb-4" alt="logo"/>
-                                            <h4 className="mb-1 text-white">Find new friends</h4>
+                                            <h4 className="mb-1 text-white">Perserve Family Memories</h4>
                                             <p>It is a long established fact that a reader will be distracted by the readable content.</p>
                                         </SwiperSlide>
                                         <SwiperSlide>
                                             <Image src={login2} className="img-fluid mb-4" alt="logo"/> 
-                                            <h4 className="mb-1 text-white">Connect with the world</h4>
+                                            <h4 className="mb-1 text-white">All Memories Together</h4>
                                             <p>It is a long established fact that a reader will be distracted by the readable content.</p>
                                         </SwiperSlide>
                                         <SwiperSlide>
                                             <Image src={login3} className="img-fluid mb-4" alt="logo"/>
-                                            <h4 className="mb-1 text-white">Create new events</h4>
+                                            <h4 className="mb-1 text-white">Connect with Other Families</h4>
                                             <p>It is a long established fact that a reader will be distracted by the readable content.</p>
                                         </SwiperSlide>
                                     </Swiper>

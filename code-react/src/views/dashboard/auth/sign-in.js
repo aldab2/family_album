@@ -85,17 +85,17 @@ const SignIn = () => {
                               className="list-inline m-0 p-0 ">
                               <SwiperSlide>
                                  <Image src={login1} className="img-fluid mb-4" alt="logo" />
-                                 <h4 className="mb-1 text-white">Find new friends</h4>
+                                 <h4 className="mb-1 text-white">Perserve Family Memories</h4>
                                  <p>It is a long established fact that a reader will be distracted by the readable content.</p>
                               </SwiperSlide>
                               <SwiperSlide>
                                  <Image src={login2} className="img-fluid mb-4" alt="logo" />
-                                 <h4 className="mb-1 text-white">Connect with the world</h4>
+                                 <h4 className="mb-1 text-white">All Memories Together</h4>
                                  <p>It is a long established fact that a reader will be distracted by the readable content.</p>
                               </SwiperSlide>
                               <SwiperSlide>
                                  <Image src={login3} className="img-fluid mb-4" alt="logo" />
-                                 <h4 className="mb-1 text-white">Create new events</h4>
+                                 <h4 className="mb-1 text-white">Connect with Other Families</h4>
                                  <p>It is a long established fact that a reader will be distracted by the readable content.</p>
                               </SwiperSlide>
                            </Swiper>

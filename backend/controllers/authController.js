@@ -62,7 +62,7 @@ const registerFamily = asyncHandler(async (req, res) => {
     family.familyMembers = [user];
     const familyReadDto = new FamilyReadDTO(family);
    req.user = user;
-    await sendVerificationEmail(req, res);
+    //await sendVerificationEmail(req, res);
     res.status(201).json(familyReadDto);
   }
   else {
