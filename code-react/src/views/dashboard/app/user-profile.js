@@ -5,7 +5,8 @@ import BlankPage from '../extrapages/blankpage'
 import { useSelector } from 'react-redux'
 import Index from '..'
 import PostsTimeline from './posts-timeline'
-
+import FriendList from './friend-list.js'
+import FriendReqest from './friend-request.js'
 
 
 const UserProfile =() =>{
@@ -157,6 +158,7 @@ useEffect(() => {
                                        <Nav variant="pills" className=" d-flex align-items-center justify-content-left friend-list-items p-0 mb-2">
                                           <Nav.Item>
                                              <Nav.Link  href="#pill-all-friends" eventKey="all-friends">All Friends</Nav.Link>
+                                       
                                           </Nav.Item>
                                           <Nav.Item>
                                              <Nav.Link href="#pill-recently-add" eventKey="incoming-requests">Incoming Requests</Nav.Link>
@@ -167,35 +169,20 @@ useEffect(() => {
                                     
                                        </Nav>
                                        <Tab.Content>
-                                       <BlankPage></BlankPage>
+                                          <Tab.Pane eventKey="all-friends" className="fade show">
+                                             <FriendList />
+                                          </Tab.Pane>
+                                          <Tab.Pane eventKey="recieved-requests" className="fade show">
+                                             <FriendReqest />
+                                          </Tab.Pane>
+                                                               
                                        </Tab.Content>
                                     </div>
                                  </Card.Body>
                               </Card>
                            </Tab.Container>
                         </Tab.Pane> 
-                        {/* <Tab.Pane eventKey="forth" >
-                           <Tab.Container id="left-tabs-example" defaultActiveKey="p1">
-                              <Card>
-                                 <Card.Body>
-                                    <h2>Photos</h2>
-                                    <div className="friend-list-tab mt-2">
-                                       <Nav variant="pills"  className=" d-flex align-items-center justify-content-left friend-list-items p-0 mb-2">
-                                          <li>
-                                             <Nav.Link eventKey="p1" href="#pill-photosofyou">Photos of You</Nav.Link>
-                                          </li>
-                                          <li>
-                                             <Nav.Link eventKey="p2" href="#pill-your-photos" >Your Photos</Nav.Link>
-                                          </li>
-                                       </Nav>
-                                       <Tab.Content>
-                                         
-                                       </Tab.Content>
-                                    </div>
-                                 </Card.Body>
-                              </Card>
-                           </Tab.Container>
-                        </Tab.Pane> */}
+
                         
                      </Tab.Content>
                   </Col>

@@ -62,7 +62,7 @@ export function FamilyMember({ member, updateUser, deleteUser, family, onSetFami
                 ...family,
                 familyMembers: family.familyMembers.filter((member) => member.userName !== userNameToDelete)
               }));
-            
+
         } catch (error) {
             console.log(error)
             toast.error(`Failed to delete family member: ${error.data?.message || 'An error occurred'}`);
