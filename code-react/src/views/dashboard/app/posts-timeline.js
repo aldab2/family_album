@@ -53,6 +53,7 @@ const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
         triggerGetPosts({ page: 1, onlyMyPosts, type })
     }, [userInfo, triggerGetPosts, onlyMyPosts, type]); // Listen for changes to userInfo
 
+    
    
     useEffect(() => {
         console.log("Data:", data);
@@ -105,10 +106,13 @@ const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
     const fetchData = async () => {
         if (!isFetching && !error && hasMorePosts) {
             // Introduce an artificial delay
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r,2000));
     
-            setPage(prevPage => prevPage + 1);
-            triggerGetPosts({ page, onlyMyPosts, type })
+            setPage(prevPage => {
+                const nextPage = prevPage + 1;
+                triggerGetPosts({ page: nextPage, onlyMyPosts, type }); // Use the updated page number here
+                return nextPage; // Return the updated page number to update the state
+            });
             
         }
     };

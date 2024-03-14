@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
 import Family from '../models/familyModel.js'
+import Post from '../models/postModel.js'
 import { generateToken, releaseToken } from '../utils/jwtUtils.js';
 import { FamilyCreateDTO, FamilyReadDTO } from '../DTOs/FamilyDTOs.js';
 import { UserCreateDTO, UserReadDTO, UserUpdateDTO } from '../DTOs/UserDTOs.js';
@@ -62,7 +63,7 @@ const registerFamily = asyncHandler(async (req, res) => {
     family.familyMembers = [user];
     const familyReadDto = new FamilyReadDTO(family);
    req.user = user;
-    await sendVerificationEmail(req, res);
+    //await sendVerificationEmail(req, res);
     res.status(201).json(familyReadDto);
   }
   else {
@@ -89,7 +90,18 @@ const getFamilyProfile = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const editFamilyProfile = asyncHandler(async (req, res) => {
-  res.status(200).send({ message: "Edit Family" })
+  const familyId = req.user.family;
+  try {
+    const editedFamily = await Family.findOneAndUpdate(
+      { _id: familyId },
+      { spaceName: req.body.spaceName },
+      { new: true }
+    )
+    res.status(200).json(new FamilyReadDTO(editedFamily))
+  } catch (error) {
+    res.status(400);
+    throw new Error("Couldn't update family profile");
+  }
 });
 
 
@@ -99,7 +111,32 @@ const editFamilyProfile = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const deleteFamilyProfile = asyncHandler(async (req, res) => {
+  //still needs finilizing
+  try {
+    // find posts
+    const posts = await Post.find(
+      { family: req.user.family }
+    )
+    // delete posts
+    const postDeletion = await Promise.all(posts.map(async post => {
+      const res = await fetch('/api/post', {
+        method: 'DELETE',
+        body: JSON.stringify({id: post._id})
+      })
+      const data = await res.json()
+      return data
+    }))
+    // delete family
+    const familyDeletion = await Family.deleteOne(
+      { _id: req.user.family }
+    )
+    res.status(200).json({familyDeletion, postDeletion})
+  } catch (error) {
+    res.status(400);
+    throw new Error("Couldn't update family profile");
+  }
   res.status(200).send({ message: "Delete Family" })
+  
 });
 
 
@@ -380,6 +417,27 @@ const verifyCode = asyncHandler(async (req, res) => {
 })
 
 
+/**
+ * @desc Get new verification code
+ * @route GET /api/auth/getVerificationCode
+ * 
+ */
+const getNewVerificationCode = asyncHandler(async (req, res) => {
+  try {
+    const newCode = getRandomActivationCode()
+    const updatedUser = User.findOneAndUpdate(
+      { _id: req.user._id },
+      { activationCode: newCode },
+      { new: true }
+    )
+    req.user.activationCode = newCode
+    await sendVerificationEmail(req, res);
+    res.status(200).json({ code: newCode })
+  } catch (error) {
+    res.status(400)
+    throw new Error("Something went wrong")
+  }
+})
 
 
 export {
@@ -394,5 +452,6 @@ export {
   deleteFamilyMember,
   logoutUser,
   changePassword,
-  verifyCode
+  verifyCode,
+  getNewVerificationCode
 };

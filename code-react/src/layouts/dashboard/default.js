@@ -94,7 +94,7 @@ const Default = () => {
                 <Outlet />
             </div>
             <Footer />
-            <SettingOffCanvas />
+            {/* <SettingOffCanvas /> */}
         </>
     );
 }

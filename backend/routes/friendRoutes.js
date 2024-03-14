@@ -8,7 +8,8 @@ import {
     removeFamilyFriend
 } from '../controllers/friendController.js'
 
-import { protect, isParent } from '../middleware/authMidleware.js';
+import { protect, isParent } from '../middleware/authMiddleware.js';
+import { editFamilyMember, editFamilyProfile } from '../controllers/authController.js';
 
 const router = express.Router();
 

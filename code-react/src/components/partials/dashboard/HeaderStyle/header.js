@@ -267,7 +267,7 @@ const Header = () => {
                           </Link>
                         </div>
                       </div>
-                      <div className="d-flex align-items-center iq-sub-card border-0">
+                      {/* <div className="d-flex align-items-center iq-sub-card border-0">
                         <span className="material-symbols-outlined">
                           manage_accounts
                         </span>
@@ -279,7 +279,7 @@ const Header = () => {
                             Account settings
                           </Link>
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="d-flex align-items-center iq-sub-card"  onClick={logoutHandler}>
                         <span className="material-symbols-outlined">login</span>

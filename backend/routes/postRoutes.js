@@ -11,7 +11,7 @@ import {
     editComment,
     deleteComment
 } from '../controllers/commentController.js'
-import { protect } from '../middleware/authMidleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 import multer from 'multer'
 
 const upload = multer({ storage: multer.memoryStorage() });
