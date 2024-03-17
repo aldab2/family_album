@@ -6,30 +6,71 @@ import {Link} from 'react-router-dom'
 //profile-header
 import ProfileHeader from '../../../components/profile-header'
 
-// image
-import img1 from '../../../assets/images/page-img/profile-bg2.jpg'
-import img2 from '../../../assets/images/page-img/profile-bg1.jpg'
 import img3 from '../../../assets/images/page-img/profile-bg3.jpg'
-import img4 from '../../../assets/images/page-img/profile-bg4.jpg'
-import img5 from '../../../assets/images/page-img/profile-bg5.jpg'
-import img6 from '../../../assets/images/page-img/profile-bg6.jpg'
-import img7 from '../../../assets/images/page-img/profile-bg7.jpg'
-import img8 from '../../../assets/images/page-img/profile-bg8.jpg'
-import img9 from '../../../assets/images/page-img/profile-bg9.jpg'
-import user05 from '../../../assets/images/user/05.jpg'
-import user06 from '../../../assets/images/user/06.jpg'
-import user07 from '../../../assets/images/user/07.jpg'
-import user08 from '../../../assets/images/user/08.jpg'
-import user09 from '../../../assets/images/user/09.jpg'
-import user10 from '../../../assets/images/user/10.jpg'
-import user13 from '../../../assets/images/user/13.jpg'
-import user14 from '../../../assets/images/user/14.jpg'
-import user15 from '../../../assets/images/user/15.jpg'
-import user16 from '../../../assets/images/user/16.jpg'
-import user17 from '../../../assets/images/user/17.jpg'
-import user18 from '../../../assets/images/user/18.jpg'
-import user19 from '../../../assets/images/user/19.jpg'
 
+
+const friends = {
+    _id: "65f4bdb84e0c4032cc361d1e",
+    spaceName: "Gashlan2",
+    familyMembers: [
+        {
+            _id: "65f4d799699a32beef7bae54",
+            firstName: "saud1",
+            lastName: "Saud1",
+            userName: "Saud",
+            email: "saudalbrahim2@gmail.com",
+            gender: "male",
+            dateOfBirth: "2012-05-05T00:00:00.000Z",
+            active: true,
+            activationCode: "73691",
+            role: "parent",
+            createdAt: "2024-03-15T23:19:53.642Z",
+            updatedAt: "2024-03-15T23:20:14.181Z",
+            __v: 0,
+            family: "65f4d799699a32beef7bae56"
+        },
+        {
+            _id: "65f4d799699a32beef733bae54",
+            firstName: "saud2",
+            lastName: "Saud2",
+            userName: "Saud",
+            email: "saudalbrahim2@gmail.com",
+            gender: "male",
+            dateOfBirth: "2012-05-05T00:00:00.000Z",
+            active: true,
+            activationCode: "73691",
+            role: "child",
+            createdAt: "2024-03-15T23:19:53.642Z",
+            updatedAt: "2024-03-15T23:20:14.181Z",
+            __v: 0,
+            family: "65f4d799699a32beef7bae56"
+        },
+        {
+            _id: "65f4d799699a32beef733bae54",
+            firstName: "saud3",
+            lastName: "Saud3",
+            userName: "Saud",
+            email: "saudalbrahim2@gmail.com",
+            gender: "male",
+            dateOfBirth: "2012-05-05T00:00:00.000Z",
+            active: true,
+            activationCode: "73691",
+            role: "parent",
+            createdAt: "2024-03-15T23:19:53.642Z",
+            updatedAt: "2024-03-15T23:20:14.181Z",
+            __v: 0,
+            family: "65f4d799699a32beef7bae56"
+        },
+        
+    ],
+    friends: [
+        "65a9328c79bd3261ba6ac4ac",
+        "65a9328c79bd3261ba6ac4ac"
+    ],
+    createdAt: "2024-03-15T21:29:28.639Z",
+    updatedAt: "2024-03-15T22:59:53.375Z",
+    __v: 2
+}
 
 const FriendList =() =>{
     return(
@@ -38,492 +79,53 @@ const FriendList =() =>{
                 <div id="content-page" className="content-page">
                     <Container>
                         <Row>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img1} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user05} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Anna Sthesia</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className="card-body profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img2} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user06} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Paul Molive</Link>
-                                                                </h4>
-                                                                <h6>@developer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img4} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user07} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Anna Mull</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img5} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user08} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Paige Turner</Link>
-                                                                </h4>
-                                                                <h6>@tester</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img6} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user09} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Bob Frapples</Link>
-                                                                </h4>
-                                                                <h6>@developer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <div className="card card-block card-stretch card-height">
-                                    <div className="card-body profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img7} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user10} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Barb Ackue</Link>
-                                                                </h4>
-                                                                <h6>@grapfics</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col md={6}>
-                                <div className="card card-block card-stretch card-height">
-                                    <div className="card-body profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img8} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user13} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Greta Life</Link>
-                                                                </h4>
-                                                                <h6>@fashion</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col md={6}>
-                                <div className="card card-block card-stretch card-height">
-                                    <div className="card-body profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img9} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user14} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Ira Membrit</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col md={6}>
-                                <div className="card card-block card-stretch card-height">
-                                    <div className="card-body profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img2} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user15} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Pete Sariya</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col md={6}>
-                                <div className="card card-block card-stretch card-height">
-                                    <div className="card-body profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img1} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user16} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Monty Carlo</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col md={6}>
-                                <div className="card card-block card-stretch card-height">
-                                    <div className="card-body profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img5} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user17} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Ed Itorial</Link>
-                                                                </h4>
-                                                                <h6>@testen</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col md={6}>
-                                <Card className="card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img8} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user18} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Paul Issy</Link>
-                                                                </h4>
-                                                                <h6>@r&d</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img7} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user19} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Rick Shaw</Link>
-                                                                </h4>
-                                                                <h6>@coder</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img9} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user07} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Ben Effit</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className=" card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img4} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user08} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Justin Case</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className="card-block card-stretch card-height">
-                                    <Card.Body className=" profile-page p-0">
-                                        <div className="profile-header-image">
-                                            <div className="cover-container">
-                                                <img loading="lazy" src={img1} alt="profile-bg" className="rounded img-fluid w-100"/>
-                                            </div>
-                                            <div className="profile-info p-4">
-                                                <div className="user-detail">
-                                                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                                                        <div className="profile-detail d-flex">
-                                                            <div className="profile-img pe-4">
-                                                                <img loading="lazy" src={user09} alt="profile-img" className="avatar-130 img-fluid" />
-                                                            </div>
-                                                            <div className="user-data-block">
-                                                                <h4>
-                                                                    <Link to="/dashboard/app/friend-profile">Aaron Ottix</Link>
-                                                                </h4>
-                                                                <h6>@designer</h6>
-                                                                <p>Lorem Ipsum is simply dummy text of the</p>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" className="btn btn-primary">Following</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
+                            <Friend friends = {friends}/>
+                            
+                            
                         </Row>
                     </Container>
                 </div>
         </>
   )
 
+}
+
+
+const Friend =({friends}) => {
+    return(
+        <>
+        <Col md={6}>
+            <Card className=" card-block card-stretch card-height">
+                <Card.Body className=" profile-page p-0">
+                    <div className="profile-header-image">
+                        {/* <div className="cover-container">
+                            <img loading="lazy" src={img1} alt="profile-bg" className="rounded img-fluid w-100"/>
+                        </div> */}
+                        <div className="profile-info p-4">
+                            <div className="user-detail">
+                                <div className="d-flex flex-wrap justify-content-between align-items-start">
+                                    <div className="profile-detail d-flex">
+                                        <div className="user-data-block">
+                                            <h4>
+                                                <Link to="/dashboard/app/friend-profile">{friends.spaceName}</Link>
+                                            </h4>
+                                            {/* Display only family members with the role of parent */}
+                                            {friends.familyMembers.filter(member => member.role === "parent").map((parent, index) => (
+                                            <h6 key={parent._id}>{parent.firstName} {parent.lastName}</h6>
+                                            ))}
+                                            <p>{friends.friends.length} Friends</p>
+                                        </div>
+                                    </div>
+                                    {/* <button type="submit" className="btn btn-primary">Following</button> */}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Card.Body>
+            </Card>
+        </Col>
+        </>
+    )
 }
 
 export default FriendList;

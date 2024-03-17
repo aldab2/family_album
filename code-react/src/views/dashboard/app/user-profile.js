@@ -7,6 +7,7 @@ import Index from '..'
 import PostsTimeline from './posts-timeline'
 import FriendList from './friend-list.js'
 import FriendReqest from './friend-request.js'
+import AddFriend from './add-friend.js'
 
 
 const UserProfile =() =>{
@@ -161,10 +162,10 @@ useEffect(() => {
                                        
                                           </Nav.Item>
                                           <Nav.Item>
-                                             <Nav.Link href="#pill-recently-add" eventKey="incoming-requests">Incoming Requests</Nav.Link>
+                                             <Nav.Link href="#pill-recently-add" eventKey="Received-Requests">Received Requests</Nav.Link>
                                           </Nav.Item>
                                           <Nav.Item>
-                                             <Nav.Link href="#pill-closefriends" eventKey="recieved-requests"> Received Requests</Nav.Link>
+                                             <Nav.Link href="#pill-closefriends" eventKey="Add-Friend">Add Friend</Nav.Link>
                                           </Nav.Item>
                                     
                                        </Nav>
@@ -172,9 +173,13 @@ useEffect(() => {
                                           <Tab.Pane eventKey="all-friends" className="fade show">
                                              <FriendList />
                                           </Tab.Pane>
-                                          <Tab.Pane eventKey="recieved-requests" className="fade show">
+                                          <Tab.Pane eventKey="Received-Requests" className="fade show">
                                              <FriendReqest />
                                           </Tab.Pane>
+                                          <Tab.Pane eventKey="Add-Friend" className="fade show">
+                                             <AddFriend />
+                                          </Tab.Pane>
+                                          
                                                                
                                        </Tab.Content>
                                     </div>

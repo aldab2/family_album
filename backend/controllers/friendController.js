@@ -106,11 +106,13 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
       throw new Error("Friend request not found or you are not authorized to accept the reqest.")
     }
    
-    
+    console.log("id:" + id)
     const [recipientFamily, senderFamily] = await Promise.all([
       Family.findOne({ _id: recipientFamilyId }),
       Family.findOne({ _id: friendRequest.senderFamily })
     ]);
+
+    console.log("id2:" + id)
 
     // Check for an existing friendship in both directions
     if (recipientFamily.friends.includes(friendRequest.senderFamily.toString()) && senderFamily.friends.includes(recipientFamily.toString())) {
@@ -161,12 +163,32 @@ const rejectFriendRequest  = asyncHandler(async (req, res) => {
   }
 });
 
+// const getFamilyFriends = async (req, res) => {
+//   try {
+//     const friends = await Family.find({ _id: req.user.family }).populate('friends').populate('familyMembers')
+//     res.json(friends)
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500);
+//     throw new Error(error);
+//   }
+// }
+
 const getFamilyFriends = async (req, res) => {
   try {
-    const friends = await Family.find({ _id: req.user.family }).populate('friends').populate('familyMembers')
-    res.json(friends)
+    // Assuming req.user.family contains the ID of your family
+    const yourFamily = await Family.findById(req.user.family);
+    // Get the IDs of your friends
+    const friendIds = yourFamily.friends;
+ 
+    // Find the families of your friends and populate their family members
+    const friendsWithFamilyMembers = await Family.find({ _id: { $in: friendIds } })
+      .populate('familyMembers', '-password' );
+
+ 
+    res.json(friendsWithFamilyMembers);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500);
     throw new Error(error);
   }
