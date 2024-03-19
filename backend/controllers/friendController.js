@@ -5,6 +5,9 @@ import FriendReqest from "../models/friendRequestModel.js"
 import { get } from 'http'
 import Family from '../models/familyModel.js'
 import { FamilyReadDTO } from '../DTOs/FamilyDTOs.js'
+import { addFamilyMember } from './authController.js'
+
+
 
 /**
 * @desc Get friend requests 
@@ -12,13 +15,39 @@ import { FamilyReadDTO } from '../DTOs/FamilyDTOs.js'
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getFriendRequests = asyncHandler(async (req, res) => {
-    const familyId = req.user.family;
+  try{  
+  const familyId = req.user.family;
     const receivedFriendRequests = await FriendReqest.find({ recipientFamily: familyId })
+    .populate({
+        path: 'recipientFamily',
+        populate: {
+            path: 'familyMembers',
+            model: 'User',
+            select: 'firstName lastName role' // Select only the desired fields
+        }
+    });
     const sentFriendRequests = await FriendReqest.find({ senderFamily: familyId })
+        .populate({
+            path: 'senderFamily',
+            populate: {
+                path: 'familyMembers',
+                model: 'User',
+                select: 'firstName lastName role'
+
+            }
+        });
+  
     res.json({
       received: receivedFriendRequests,
       sent: sentFriendRequests
-    })
+    }) 
+  }
+    catch(error){ 
+    console.log(error)
+      res.status(500);
+      throw new Error("Error when trying to create friend request.");
+    }
+  
   });
 
 
@@ -47,13 +76,30 @@ const sendFriendRequest = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("You can't add yourself as a friend.");
     }
-
+    
     // If already friends
+    console.log(senderFamily);
+    if(senderFamily?.friends){
     let stringifiedFriendIds = senderFamily.friends.map(id => id.toString())
     if (stringifiedFriendIds.includes(recipientFamilyId.toString())) {
       res.status(400);
       throw new Error("This Family already a friend.");
     }
+  }
+
+    // gpt Check if there is already a pending or accepted friend request
+  const existingRequest = await FriendReqest.findOne({
+    $or: [
+      { senderFamily: senderFamilyId, recipientFamily: recipientFamilyId },
+      { senderFamily: recipientFamilyId, recipientFamily: senderFamilyId }
+    ],
+    status: { $in: ['pending', 'accepted'] }
+  });
+
+  if (existingRequest) {
+    res.status(400);
+    throw new Error("A friend request already exists.");
+  }
 
     const newFriendRequest = new FriendReqest({
       senderFamily,
@@ -85,6 +131,8 @@ const deleteFriendRequest = asyncHandler(async (req, res) => {
       res.status(401)
       throw new Error("You are not authorized to delete this friend request.")
     }
+    //delete Friend Request
+    FriendReqest.deleteOne({ _id: id })
     res.send("Friend request deleted")
   } catch (error) {
     res.status(404);
@@ -106,13 +154,11 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
       throw new Error("Friend request not found or you are not authorized to accept the reqest.")
     }
    
-    console.log("id:" + id)
+    
     const [recipientFamily, senderFamily] = await Promise.all([
       Family.findOne({ _id: recipientFamilyId }),
       Family.findOne({ _id: friendRequest.senderFamily })
     ]);
-
-    console.log("id2:" + id)
 
     // Check for an existing friendship in both directions
     if (recipientFamily.friends.includes(friendRequest.senderFamily.toString()) && senderFamily.friends.includes(recipientFamily.toString())) {
@@ -127,7 +173,10 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
     await Promise.all([
       recipientFamily.save(),
       senderFamily.save(),
-      FriendReqest.findOneAndUpdate({ _id: id }, { status: 'accepted' })
+      //FriendReqest.findOneAndUpdate({ _id: id }, { status: 'accepted' })
+      //delete the friend request after it has been accepted
+      FriendReqest.deleteOne({ _id: id })
+
     ]);
 
     res.send("Friend request accepted successfully.");
@@ -153,11 +202,14 @@ const rejectFriendRequest  = asyncHandler(async (req, res) => {
 
 
     // Update the friend request status to 'rejected'
-    await FriendReqest.findOneAndUpdate({ _id: id }, { status: 'rejected' });
+    //await FriendReqest.findOneAndUpdate({ _id: id }, { status: 'rejected' });
+    // Delete the friend request
+    await FriendReqest.deleteOne({ _id: id });
 
-    res.send("Friend request rejected successfully.");
+
+    res.send("Friend request rejected and deleted successfully.");
   } catch (error) {
-    console.error("Error rejecting friend request:", error);
+    console.error("Error rejecting and deleting friend request:", error);
     res.status(500);
     throw new Error(error);
   }
@@ -183,8 +235,7 @@ const getFamilyFriends = async (req, res) => {
  
     // Find the families of your friends and populate their family members
     const friendsWithFamilyMembers = await Family.find({ _id: { $in: friendIds } })
-      .populate('familyMembers', '-password' );
-
+      .populate('familyMembers');
  
     res.json(friendsWithFamilyMembers);
   } catch (error) {
