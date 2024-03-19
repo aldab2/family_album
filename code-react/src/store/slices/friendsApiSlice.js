@@ -3,39 +3,51 @@ import { apiSlice } from "./apiSlice";
 export const friendApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getFriendRequests: builder.query({
-            query: () => '/api/friends/requests',
+            // Corrected URL to match your backend route
+            query: () => '/api/friend/request',
             providesTags: ['FriendRequests'],
         }),
         sendFriendRequest: builder.mutation({
+            // Corrected URL to match your backend route
             query: ({ recipientspaceName }) => ({
-                url: '/api/friends/send', // Assuming your endpoint URL for sending friend requests
+                url: '/api/friend/request',
                 method: 'POST',
                 body: { recipientspaceName },
             }),
             invalidatesTags: ['FriendRequests'],
         }),
         acceptFriendRequest: builder.mutation({
+            // Corrected to POST to match your backend and adjusted URL
             query: (requestId) => ({
-                url: `/api/friends/accept/${requestId}`, // Check your endpoint URL for accepting friend requests
-                method: 'PUT',
+                url: '/api/friend/acceptRequest', // Assuming requestId is sent in the body
+                method: 'POST',
+                body: { id: requestId },
             }),
             invalidatesTags: ['FriendRequests'],
         }),
         rejectFriendRequest: builder.mutation({
+            // Corrected to POST to match your backend and adjusted URL
             query: (requestId) => ({
-                url: `/api/friends/reject/${requestId}`, // Check your endpoint URL for rejecting friend requests
-                method: 'PUT',
+                url: '/api/friend/rejectRequest',
+                method: 'POST',
+                body: { id: requestId },
             }),
             invalidatesTags: ['FriendRequests'],
         }),
         deleteFriendRequest: builder.mutation({
+            // Adjusted URL to match your backend
             query: (requestId) => ({
-                url: `/api/friends/delete/${requestId}`, // Check your endpoint URL for deleting friend requests
-                method: 'DELETE',
+                url: '/api/friend/removeFamilyFriend', // Assuming requestId is sent in the body
+                method: 'POST',
+                body: { id: requestId },
             }),
             invalidatesTags: ['FriendRequests'],
         }),
-        // Additional endpoints can be added here
+        // Assuming there's an endpoint to get family friends list
+        getFamilyFriends: builder.query({
+            query: () => '/api/friend/getFamilyFriends',
+            providesTags: ['FamilyFriends'],
+        }),
     })
 });
 
@@ -45,5 +57,6 @@ export const {
     useAcceptFriendRequestMutation,
     useRejectFriendRequestMutation,
     useDeleteFriendRequestMutation,
-    // Export additional hooks as needed
+    useGetFamilyFriendsQuery, // Added export for fetching family friends
 } = friendApiSlice;
+

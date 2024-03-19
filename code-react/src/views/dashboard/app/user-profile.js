@@ -8,6 +8,8 @@ import PostsTimeline from './posts-timeline'
 import FriendList from './friend-list.js'
 import FriendReqest from './friend-request.js'
 import AddFriend from './add-friend.js'
+import { useGetFriendRequestsQuery } from '../../../store/slices/friendsApiSlice';
+
 
 
 const UserProfile =() =>{
@@ -24,6 +26,7 @@ const yearOptions = { year: 'numeric' };
 const dateTimeOptions = { day: '2-digit', month: 'short', year: 'numeric' };
 
 
+
 useEffect(() => {
    if (userInfo) {
       const dateObj = new Date(userInfo.dateOfBirth);
@@ -35,6 +38,9 @@ useEffect(() => {
       
    }
 }, [userInfo])
+
+const { data: friends, isLoading: friendsLoading, error: friendsError } = useGetFriendRequestsQuery(userInfo?._id);
+console.log("frwwww" + friends);
 
   return(
       <>
@@ -170,8 +176,10 @@ useEffect(() => {
                                     
                                        </Nav>
                                        <Tab.Content>
-                                          <Tab.Pane eventKey="all-friends" className="fade show">
-                                             <FriendList />
+                                       <Tab.Pane eventKey="all-friends" className="fade show">
+                                          {friendsLoading && <div>Loading friends...</div>}
+                                          {friendsError && <div>Error loading friends: {friendsError.message}</div>}
+                                          {!friendsLoading && !friendsError && friends && <FriendList friends={friends} />}
                                           </Tab.Pane>
                                           <Tab.Pane eventKey="Received-Requests" className="fade show">
                                              <FriendReqest />
