@@ -6,9 +6,11 @@ import { useSelector } from 'react-redux'
 import Index from '..'
 import PostsTimeline from './posts-timeline'
 import FriendList from './friend-list.js'
-import FriendReqest from './friend-request.js'
+import FriendRequest from './friend-request.js'
 import AddFriend from './add-friend.js'
 import { useGetFriendRequestsQuery } from '../../../store/slices/friendsApiSlice';
+import { useGetFamilyFriendsQuery } from '../../../store/slices/friendsApiSlice';
+
 
 
 
@@ -39,8 +41,16 @@ useEffect(() => {
    }
 }, [userInfo])
 
-const { data: friends, isLoading: friendsLoading, error: friendsError } = useGetFriendRequestsQuery(userInfo?._id);
-console.log("frwwww" + friends);
+const { data: familyFriends, isLoading: loadingFamilyFriends, error: familyFriendsError } = useGetFamilyFriendsQuery(userInfo?._id);
+//const { data: friends, isLoading: friendsLoading, error: friendsError } = useGetFriendRequestsQuery(userInfo?._id);
+const { data: friendRequests, isLoading: loadingFriendRequests, error: friendRequestsError } = useGetFriendRequestsQuery(userInfo?._id);
+
+// console.log("Family Friends data:", JSON.stringify(familyFriends, null, 2));
+
+// console.log(friendRequests.received)
+
+// console.log("Received Requests:", JSON.stringify(friendRequests, null, 2));
+
 
   return(
       <>
@@ -177,16 +187,29 @@ console.log("frwwww" + friends);
                                        </Nav>
                                        <Tab.Content>
                                        <Tab.Pane eventKey="all-friends" className="fade show">
-                                          {friendsLoading && <div>Loading friends...</div>}
-                                          {friendsError && <div>Error loading friends: {friendsError.message}</div>}
-                                          {!friendsLoading && !friendsError && friends && <FriendList friends={friends} />}
-                                          </Tab.Pane>
-                                          <Tab.Pane eventKey="Received-Requests" className="fade show">
-                                             <FriendReqest />
-                                          </Tab.Pane>
-                                          <Tab.Pane eventKey="Add-Friend" className="fade show">
-                                             <AddFriend />
-                                          </Tab.Pane>
+                                       <Tab.Pane eventKey="all-friends" className="fade show">
+                                          {loadingFamilyFriends && <div>Loading family friends...</div>}
+                                          {familyFriendsError && <div>Error loading family friends: {familyFriendsError.message}</div>}
+                                          {!loadingFamilyFriends && !familyFriendsError && familyFriends && (
+                                             <FriendList familyFriends={familyFriends} /> // Pass familyFriends as friends prop
+                                          )}
+                                       </Tab.Pane>
+
+                                       </Tab.Pane>
+                                       <Tab.Pane eventKey="Received-Requests" className="fade show">
+                                       {friendRequests ? (
+                                          <FriendRequest receivedRequests={friendRequests.received} />
+                                       ) : (
+                                          <div>Loading friend requests...</div>
+                                       )}
+                                       </Tab.Pane>
+                                       <Tab.Pane eventKey="Add-Friend" className="fade show">
+                                          {loadingFriendRequests ? (
+                                             <div>Loading...</div>
+                                          ) : (
+                                             <AddFriend pendingRequest={friendRequests?.sent || []} />
+                                          )}
+                                       </Tab.Pane>
                                           
                                                                
                                        </Tab.Content>

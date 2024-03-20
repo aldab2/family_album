@@ -19,7 +19,7 @@ const getFriendRequests = asyncHandler(async (req, res) => {
   const familyId = req.user.family;
     const receivedFriendRequests = await FriendReqest.find({ recipientFamily: familyId })
     .populate({
-        path: 'recipientFamily',
+        path: 'senderFamily',
         populate: {
             path: 'familyMembers',
             model: 'User',
@@ -28,7 +28,7 @@ const getFriendRequests = asyncHandler(async (req, res) => {
     });
     const sentFriendRequests = await FriendReqest.find({ senderFamily: familyId })
         .populate({
-            path: 'senderFamily',
+            path: 'recipientFamily',
             populate: {
                 path: 'familyMembers',
                 model: 'User',
@@ -143,7 +143,7 @@ const deleteFriendRequest = asyncHandler(async (req, res) => {
 
 //accepts friend request
 const acceptFriendRequest = asyncHandler(async (req, res) => {
-  const { id } = req.body; // ID of the friend request
+  const { id } = req.body.id; // ID of the friend request
   const recipientFamilyId = req.user.family; // The recipient's family ID, assumed to be the current user's family
 
   try {
@@ -189,7 +189,7 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
 
 
 const rejectFriendRequest  = asyncHandler(async (req, res) => {
-  const { id } = req.body; // ID of the friend request to reject
+  const { id } = req.body.id; // ID of the friend request to reject
   const recipientFamilyId = req.user.family; // The recipient's family ID, assumed to be the current user's family
 
   try {
@@ -248,7 +248,7 @@ const getFamilyFriends = async (req, res) => {
 const removeFamilyFriend = async (req, res) => {
   const {
     toRemoveId
-  } = req.body
+  } = req.body.id
 
   try {
     const selfFamily = await Family.findOne({ _id: req.user.family });
