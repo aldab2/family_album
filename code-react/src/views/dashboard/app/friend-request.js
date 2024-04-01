@@ -2,6 +2,7 @@ import React from 'react'
 import {Row,Col, Container} from 'react-bootstrap'
 import Card from '../../../components/Card'
 import { toast } from 'react-toastify';
+import {Link} from 'react-router-dom'
 import {
    useAcceptFriendRequestMutation,
    useRejectFriendRequestMutation,
@@ -81,7 +82,8 @@ const Request = ({ request }) => {
    return (
       <li className="d-flex align-items-center justify-content-between flex-wrap">
         <div className="flex-grow-1 ms-3">
-          <h4>{request.senderFamily.spaceName}</h4>
+          <Link to="#">{request.senderFamily.spaceName}</Link>
+          {/* <h4>{request.senderFamily.spaceName}</h4> */}
           {request.senderFamily.familyMembers
             .filter((member) => member.role === "parent")
             .map((parent) => (

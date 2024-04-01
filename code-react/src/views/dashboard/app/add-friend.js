@@ -47,7 +47,7 @@ const AddFriend = ({pendingRequest}) => {
                 <Row className="align-items-center justify-content-center">
                   <Col xs={12} md={7}>
                     <Form.Group controlId="formSpaceName">
-                      <Form.Label>Space Name</Form.Label>
+                      {/* <Form.Label>Space Name</Form.Label> */}
                       <Form.Control
                         type="text"
                         placeholder="Enter SpaceName"

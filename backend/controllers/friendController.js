@@ -179,7 +179,7 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
 
     ]);
 
-    res.send("Friend request accepted successfully.");
+    res.json("Friend request accepted successfully.");
   } catch (error) {
     console.error("Error accepting friend request:", error);
     res.status(500);
@@ -207,7 +207,7 @@ const rejectFriendRequest  = asyncHandler(async (req, res) => {
     await FriendReqest.deleteOne({ _id: id });
 
 
-    res.send("Friend request rejected and deleted successfully.");
+    res.json("Friend request rejected and deleted successfully.");
   } catch (error) {
     console.error("Error rejecting and deleting friend request:", error);
     res.status(500);
