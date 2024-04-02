@@ -41,16 +41,23 @@ useEffect(() => {
    }
 }, [userInfo])
 
-const { data: familyFriends, isLoading: loadingFamilyFriends, error: familyFriendsError } = useGetFamilyFriendsQuery(userInfo?._id);
+const { data: familyFriends, isLoading: loadingFamilyFriends, error: familyFriendsError, refetch: refetchFamilyFriends} = useGetFamilyFriendsQuery(userInfo?._id);
 //const { data: friends, isLoading: friendsLoading, error: friendsError } = useGetFriendRequestsQuery(userInfo?._id);
-const { data: friendRequests, isLoading: loadingFriendRequests, error: friendRequestsError } = useGetFriendRequestsQuery(userInfo?._id);
+const { data: friendRequests, isLoading: loadingFriendRequests, error: friendRequestsError, refetch: refetchFriendRequests } = useGetFriendRequestsQuery(userInfo?._id);
 
 // console.log("Family Friends data:", JSON.stringify(familyFriends, null, 2));
 
 // console.log(friendRequests.received)
 
 // console.log("Received Requests:", JSON.stringify(friendRequests, null, 2));
+// Function to trigger refetch
+const handleFriendRequestsRefetch = () => {
+   refetchFriendRequests();
+ };
 
+ const handleFriendsRefetch = () =>{
+   refetchFamilyFriends();
+ }
 
   return(
       <>
@@ -174,14 +181,14 @@ const { data: friendRequests, isLoading: loadingFriendRequests, error: friendReq
                                     <div className="friend-list-tab mt-2">
                                        <Nav variant="pills" className=" d-flex align-items-center justify-content-left friend-list-items p-0 mb-2">
                                           <Nav.Item>
-                                             <Nav.Link  href="#pill-all-friends" eventKey="all-friends">All Friends</Nav.Link>
+                                             <Nav.Link  href="#pill-all-friends" eventKey="all-friends" onClick={() => refetchFamilyFriends()}>All Friends</Nav.Link>
                                        
                                           </Nav.Item>
                                           <Nav.Item>
-                                             <Nav.Link href="#pill-recently-add" eventKey="Received-Requests">Received Requests</Nav.Link>
+                                             <Nav.Link href="#pill-recently-add" eventKey="Received-Requests" onClick={() => refetchFriendRequests()}>Received Requests</Nav.Link>
                                           </Nav.Item>
                                           <Nav.Item>
-                                             <Nav.Link href="#pill-closefriends" eventKey="Add-Friend">Add Friend</Nav.Link>
+                                             <Nav.Link href="#pill-closefriends" eventKey="Add-Friend" onClick={() => refetchFriendRequests()}>Add Friend</Nav.Link>
                                           </Nav.Item>
                                     
                                        </Nav>
@@ -191,14 +198,14 @@ const { data: friendRequests, isLoading: loadingFriendRequests, error: friendReq
                                           {loadingFamilyFriends && <div>Loading family friends...</div>}
                                           {familyFriendsError && <div>Error loading family friends: {familyFriendsError.message}</div>}
                                           {!loadingFamilyFriends && !familyFriendsError && familyFriends && (
-                                             <FriendList familyFriends={familyFriends} /> // Pass familyFriends as friends prop
+                                             <FriendList familyFriends={familyFriends}  refetchFriends={handleFriendsRefetch}/> // Pass familyFriends as friends prop
                                           )}
                                        </Tab.Pane>
 
                                        </Tab.Pane>
                                        <Tab.Pane eventKey="Received-Requests" className="fade show">
                                        {friendRequests ? (
-                                          <FriendRequest receivedRequests={friendRequests.received} />
+                                          <FriendRequest receivedRequests={friendRequests.received}/>
                                        ) : (
                                           <div>Loading friend requests...</div>
                                        )}
@@ -207,7 +214,7 @@ const { data: friendRequests, isLoading: loadingFriendRequests, error: friendReq
                                           {loadingFriendRequests ? (
                                              <div>Loading...</div>
                                           ) : (
-                                             <AddFriend pendingRequest={friendRequests?.sent || []} />
+                                             <AddFriend pendingRequest={friendRequests?.sent || []} refetchFriendRequests={handleFriendRequestsRefetch} />
                                           )}
                                        </Tab.Pane>
                                           

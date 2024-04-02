@@ -12,7 +12,7 @@ import img3 from '../../../assets/images/page-img/profile-bg3.jpg'
 
 
 
-const FriendList = ({ familyFriends }) => {
+const FriendList = ({ familyFriends , refetchFriends}) => {
     if (!familyFriends) return <div>Loading friends...</div>;
     
     return (
@@ -22,7 +22,7 @@ const FriendList = ({ familyFriends }) => {
                 <Container>
                     <Row>
                         {familyFriends.map(friend => (
-                            <Friend key={friend._id} friend={friend} />
+                            <Friend key={friend._id} friend={friend} refetchFriends={refetchFriends}/>
                         ))}
                     </Row>
                 </Container>
@@ -31,7 +31,7 @@ const FriendList = ({ familyFriends }) => {
     );
 };
 
-const Friend = ({ friend  }) => {
+const Friend = ({ friend ,refetchFriends }) => {
     // console.log(familyFriends)
     const [deleteFriendRequest, { isLoading: isDeleting }] = useDeleteFriendRequestMutation();
 
@@ -39,7 +39,8 @@ const Friend = ({ friend  }) => {
         try {
             // Assuming the API needs the friend's ID to remove them
             await deleteFriendRequest({ toRemoveId: friend._id }).unwrap();
-            toast.error('Friend removed successfully.');
+            refetchFriends();
+            toast.success('Friend removed successfully.');
         } catch (err) {
             console.error('Failed to remove friend:', err);
             toast.error('Failed to remove friend.');

@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 
 
-const AddFriend = ({pendingRequest}) => {
+const AddFriend = ({pendingRequest,refetchFriendRequests}) => {
   const [spaceName, setSpaceName] = useState('');
   const [sendFriendRequest, { isLoading }] = useSendFriendRequestMutation();
 
@@ -23,6 +23,7 @@ const AddFriend = ({pendingRequest}) => {
       await sendFriendRequest({ recipientspaceName: spaceName }).unwrap();
       toast.success('Friend request sent successfully!');
       setSpaceName(''); // Clear input field after successful request
+      refetchFriendRequests();
     } catch (error) {
       toast.error(`Failed to send friend request: ${error.data?.message || error.message}`);
     }
