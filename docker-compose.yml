@@ -25,7 +25,8 @@ services:
       - app-network
 
   backend:
-    image: abbarnawi/family-space-backend:latest
+    image: abbarnawi/family-space-backend:v1.2
+    build: ./backend/
     env_file:
       - ./backend/.dockerenv
     depends_on:
@@ -38,6 +39,7 @@ services:
 
   frontend:
     image: abbarnawi/family-space-frontend:latest
+    build: ./code-react/
     volumes:
       - ./code-react/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
