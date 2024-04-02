@@ -8,6 +8,7 @@ import CustomToggle from '../../../components/dropdowns'
 import img1 from '../../../assets/images/small/07.png'
 
 
+import { useAddCommentMutation, useEditCommentMutation, useDeleteCommentMutation } from '../../../store/slices/commentsApiSlice';
 
 
 
@@ -22,6 +23,23 @@ import { timeAgo } from '../../../utilities/general'
 
 
 const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
+    const [addComment, { isLoading: isAddingComment }] = useAddCommentMutation();
+    const [commentContent, setCommentContent] = useState('');
+    const handleSubmitComment = async (postId) => {
+        try {
+          await addComment({ content: commentContent, postId }).unwrap();
+          setCommentContent(''); // Clear the comment input field after successful submission
+          toast.success('Comment added successfully');
+          // Optionally, refresh comments or the post here
+        } catch (error) {
+          console.error('Failed to add comment:', error);
+          toast.error('Failed to add comment');
+        }
+      };
+      
+
+
+
     const [show, setShow] = useState(false);
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(1);
@@ -483,7 +501,11 @@ const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
                                         <img src={comment.userImage} alt="user" className="avatar-35 rounded-circle img-fluid"/>
                                     </div> */}
                                                                     <div className="comment-data-block ms-3">
-                                                                        <h5>{comment.author}</h5>
+                                                                        <h5>
+                                                                        <Link to="#">
+                                                                        {comment.author}
+                                                                        </Link>
+                                                                        </h5>
                                                                         <p className="mb-0">{comment.content}</p>
                                                                         <div className="d-flex flex-wrap align-items-center comment-activity">
                                                                            
@@ -495,14 +517,30 @@ const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
                                                         })}
                                                       
                                                     </ul>
-                                                    <form className="comment-text d-flex align-items-center mt-3" >
+                                                    {/* <form className="comment-text d-flex align-items-center mt-3" >
                                                         <input type="text" className="form-control rounded" placeholder="Enter Your Comment" />
-                                                        <Button variant="primary" className="m-3" type="submit">Post</Button>{' '}
+                                                        <Button variant="primary" className="m-3" type="submit">Post</Button>{' '} */}
                                                         {/* <div className="comment-attagement d-flex">
                                 <Link to="#"><i className="ri-link me-3"></i></Link>
                                 <Link to="#"><i className="ri-user-smile-line me-3"></i></Link>
                                 <Link to="#"><i className="ri-camera-line me-3"></i></Link>
-                            </div>*/}
+                            </div>*/}               
+                                                    <form
+                                                        className="comment-text d-flex align-items-center mt-3"
+                                                        onSubmit={(e) => {
+                                                            e.preventDefault();
+                                                            handleSubmitComment(post._id); // Replace `post._id` with the correct variable that holds the post ID
+                                                        }}
+                                                        >
+                                                            {/* Comment input and submit button as defined above */}
+                                                            <input
+                                                                type="text"
+                                                                className="form-control rounded"
+                                                                placeholder="Enter Your Comment"
+                                                                value={commentContent}
+                                                                onChange={(e) => setCommentContent(e.target.value)}
+                                                                />
+                                                            <Button variant="primary" className="m-3" type="submit">Post</Button>
                                                     </form>
                                                 </div>
                                             </Card.Body>

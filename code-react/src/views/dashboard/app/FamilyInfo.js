@@ -3,7 +3,7 @@ import { Row, Card, Tab, Form, Button } from 'react-bootstrap';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-export function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFamilyMember }) {
+export function FamilyInfo({ family, onSetFamily, editFamilyProfile, addFamilyMember }) {
 
     // Initialize state for edit mode and edited space name
     const [isEditMode, setIsEditMode] = useState(false);
@@ -69,6 +69,10 @@ export function FamilyInfo({ family, updateFamilyInfo, editFamilyProfile, addFam
             }).unwrap();
             toast.success('Family member added successfully!');
             handleAddMemberHide(); // Hide the add member form
+            onSetFamily((family) => ({
+                ...family,
+                familyMembers: [...family.familyMembers, newMember]
+              }));
 
             // Reset form fields after successful submission
             setNewMember({
