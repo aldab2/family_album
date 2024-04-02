@@ -1,5 +1,21 @@
 #  Distributed Cloud Based Social Media For Families. 
 
+## Running using docker
+
+```cd <to project root directory>```
+
+Linux
+```bash
+ docker-compose up --build
+```
+Windows 
+```cmd 
+docker compose up --build
+```
+
+
+## Running using npm
+
 ### Backend
 #### Node, ExpressJS and Mongo (found in dir /backend)
 First run 
@@ -14,14 +30,3 @@ First run
 ### To run them all 
 Run ```npm install``` inside the root directory,frontend and backend (3 times), then run ``` npm run dev ``` inside the root
 
-#### Backend docker
-
-```cd backend```
-```docker run -d --env-file .env --network="host" --name backend  abbarnawi/family-space-backend:latest```
-
-
-
-#### frontend docker
-
-```cd code-react```
-```docker run -d  -v ${PWD}/nginx.conf:/etc/nginx/conf.d/default.conf --network="host"  --name frontend abbarnawi/family-space-frontend:latest```
