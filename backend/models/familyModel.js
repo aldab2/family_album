@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const familySchema = mongoose.Schema({
     spaceName:{
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     familyMembers:[{
         type: mongoose.Schema.Types.ObjectId,

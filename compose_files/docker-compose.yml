@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+
+  backend:
+    image: abbarnawi/family-space-backend:latest
+    env_file:
+      - .dockerenv
+    network_mode: "host"
+    restart: unless-stopped
+
+  frontend:
+    image: abbarnawi/family-space-frontend:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    network_mode: "host"
+    restart: unless-stopped

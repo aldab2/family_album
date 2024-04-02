@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ./database/db:/data/db
+    network_mode: "host"
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: familyspace 
+      MONGO_INITDB_ROOT_PASSWORD: familyspace 
+
+  minio:
+    image: quay.io/minio/minio
+    command: server /mnt/data --console-address ":9090"
+    volumes:
+      - ./object_storage/data:/mnt/data
+      - ./object_storage/config.env:/etc/config.env
+    env_file:
+      - ./object_storage/config.env
+    network_mode: "host"
+    restart: unless-stopped

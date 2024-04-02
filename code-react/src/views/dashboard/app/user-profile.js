@@ -5,6 +5,12 @@ import BlankPage from '../extrapages/blankpage'
 import { useSelector } from 'react-redux'
 import Index from '..'
 import PostsTimeline from './posts-timeline'
+import FriendList from './friend-list.js'
+import FriendRequest from './friend-request.js'
+import AddFriend from './add-friend.js'
+import { useGetFriendRequestsQuery } from '../../../store/slices/friendsApiSlice';
+import { useGetFamilyFriendsQuery } from '../../../store/slices/friendsApiSlice';
+
 
 
 
@@ -22,6 +28,7 @@ const yearOptions = { year: 'numeric' };
 const dateTimeOptions = { day: '2-digit', month: 'short', year: 'numeric' };
 
 
+
 useEffect(() => {
    if (userInfo) {
       const dateObj = new Date(userInfo.dateOfBirth);
@@ -33,6 +40,24 @@ useEffect(() => {
       
    }
 }, [userInfo])
+
+const { data: familyFriends, isLoading: loadingFamilyFriends, error: familyFriendsError, refetch: refetchFamilyFriends} = useGetFamilyFriendsQuery(userInfo?._id);
+//const { data: friends, isLoading: friendsLoading, error: friendsError } = useGetFriendRequestsQuery(userInfo?._id);
+const { data: friendRequests, isLoading: loadingFriendRequests, error: friendRequestsError, refetch: refetchFriendRequests } = useGetFriendRequestsQuery(userInfo?._id);
+
+// console.log("Family Friends data:", JSON.stringify(familyFriends, null, 2));
+
+// console.log(friendRequests.received)
+
+// console.log("Received Requests:", JSON.stringify(friendRequests, null, 2));
+// Function to trigger refetch
+const handleFriendRequestsRefetch = () => {
+   refetchFriendRequests();
+ };
+
+ const handleFriendsRefetch = () =>{
+   refetchFamilyFriends();
+ }
 
   return(
       <>
@@ -156,46 +181,51 @@ useEffect(() => {
                                     <div className="friend-list-tab mt-2">
                                        <Nav variant="pills" className=" d-flex align-items-center justify-content-left friend-list-items p-0 mb-2">
                                           <Nav.Item>
-                                             <Nav.Link  href="#pill-all-friends" eventKey="all-friends">All Friends</Nav.Link>
+                                             <Nav.Link  href="#pill-all-friends" eventKey="all-friends" onClick={() => refetchFamilyFriends()}>All Friends</Nav.Link>
+                                       
                                           </Nav.Item>
                                           <Nav.Item>
-                                             <Nav.Link href="#pill-recently-add" eventKey="incoming-requests">Incoming Requests</Nav.Link>
+                                             <Nav.Link href="#pill-recently-add" eventKey="Received-Requests" onClick={() => refetchFriendRequests()}>Received Requests</Nav.Link>
                                           </Nav.Item>
                                           <Nav.Item>
-                                             <Nav.Link href="#pill-closefriends" eventKey="recieved-requests"> Received Requests</Nav.Link>
+                                             <Nav.Link href="#pill-closefriends" eventKey="Add-Friend" onClick={() => refetchFriendRequests()}>Add Friend</Nav.Link>
                                           </Nav.Item>
                                     
                                        </Nav>
                                        <Tab.Content>
-                                       <BlankPage></BlankPage>
+                                       <Tab.Pane eventKey="all-friends" className="fade show">
+                                       <Tab.Pane eventKey="all-friends" className="fade show">
+                                          {loadingFamilyFriends && <div>Loading family friends...</div>}
+                                          {familyFriendsError && <div>Error loading family friends: {familyFriendsError.message}</div>}
+                                          {!loadingFamilyFriends && !familyFriendsError && familyFriends && (
+                                             <FriendList familyFriends={familyFriends}  refetchFriends={handleFriendsRefetch}/> // Pass familyFriends as friends prop
+                                          )}
+                                       </Tab.Pane>
+
+                                       </Tab.Pane>
+                                       <Tab.Pane eventKey="Received-Requests" className="fade show">
+                                       {friendRequests ? (
+                                          <FriendRequest receivedRequests={friendRequests.received}/>
+                                       ) : (
+                                          <div>Loading friend requests...</div>
+                                       )}
+                                       </Tab.Pane>
+                                       <Tab.Pane eventKey="Add-Friend" className="fade show">
+                                          {loadingFriendRequests ? (
+                                             <div>Loading...</div>
+                                          ) : (
+                                             <AddFriend pendingRequest={friendRequests?.sent || []} refetchFriendRequests={handleFriendRequestsRefetch} />
+                                          )}
+                                       </Tab.Pane>
+                                          
+                                                               
                                        </Tab.Content>
                                     </div>
                                  </Card.Body>
                               </Card>
                            </Tab.Container>
                         </Tab.Pane> 
-                        {/* <Tab.Pane eventKey="forth" >
-                           <Tab.Container id="left-tabs-example" defaultActiveKey="p1">
-                              <Card>
-                                 <Card.Body>
-                                    <h2>Photos</h2>
-                                    <div className="friend-list-tab mt-2">
-                                       <Nav variant="pills"  className=" d-flex align-items-center justify-content-left friend-list-items p-0 mb-2">
-                                          <li>
-                                             <Nav.Link eventKey="p1" href="#pill-photosofyou">Photos of You</Nav.Link>
-                                          </li>
-                                          <li>
-                                             <Nav.Link eventKey="p2" href="#pill-your-photos" >Your Photos</Nav.Link>
-                                          </li>
-                                       </Nav>
-                                       <Tab.Content>
-                                         
-                                       </Tab.Content>
-                                    </div>
-                                 </Card.Body>
-                              </Card>
-                           </Tab.Container>
-                        </Tab.Pane> */}
+
                         
                      </Tab.Content>
                   </Col>

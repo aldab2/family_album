@@ -1,5 +1,21 @@
 #  Distributed Cloud Based Social Media For Families. 
 
+## Running using docker
+
+```cd <to project root directory>```
+
+Linux
+```bash
+ docker-compose up --build
+```
+Windows 
+```cmd 
+docker compose up --build
+```
+
+
+## Running using npm
+
 ### Backend
 #### Node, ExpressJS and Mongo (found in dir /backend)
 First run 
@@ -13,3 +29,4 @@ First run
 
 ### To run them all 
 Run ```npm install``` inside the root directory,frontend and backend (3 times), then run ``` npm run dev ``` inside the root
+

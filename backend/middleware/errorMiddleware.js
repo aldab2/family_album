@@ -7,6 +7,7 @@ const notFound = (req,res,next) =>{
 
 /*** @type {import("express").ErrorRequestHandler} */
 const errorHandler = (err,req,res,next) =>{
+    console.log(err)
     let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
     let message = err.message;
 

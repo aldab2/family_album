@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    image: abbarnawi/family-space-backend:latest
+    env_file:
+      - .dockerenv
+    network_mode: "host"
+    depends_on:
+      - minio
+      - mongo
+    restart: unless-stopped
+
+  frontend:
+    image: abbarnawi/family-space-frontend:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    network_mode: "host"
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ./database/db:/data/db
+    network_mode: "host"
+    restart: unless-stopped
+
+  minio:
+    image: quay.io/minio/minio
+    command: server /mnt/data --console-address ":9090"
+    volumes:
+      - ./object_storage/data:/mnt/data
+      - ./config.env:/etc/config.env
+    env_file:
+      - ./config.env
+    network_mode: "host"
+    restart: unless-stopped
