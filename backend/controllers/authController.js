@@ -92,9 +92,17 @@ const registerFamily = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getFamilyProfile = asyncHandler(async (req, res) => {
-  const familyId = req.user.family;
-  const familyReadDto = new FamilyReadDTO(await Family.findOne({ _id: familyId }).populate('familyMembers'));
-  res.status(200).json(familyReadDto);
+  const familyId = req.query.familyId || req.user.family;
+  const familyObject = await Family.findOne({ _id: familyId }).populate('familyMembers');
+  if(familyObject){
+
+    const familyReadDto = new FamilyReadDTO(familyObject);
+    res.status(200).json(familyReadDto);
+  }
+  else {
+    res.status(400)
+    throw new Error("Family not found")
+  }
 });
 
 /**
@@ -231,9 +239,10 @@ const addFamilyMember = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getUserProfile = asyncHandler(async (req, res) => {
-  let userInfo = {...req.user}
-  delete userInfo.activationCode;
-  res.status(200).send(userInfo);
+  const userId = req.query.userId || req.user.id
+  const userReadDTO = new UserReadDTO(await User.findOne({ _id: userId }));
+  res.status(200).json(userReadDTO);
+
 });
 
 
