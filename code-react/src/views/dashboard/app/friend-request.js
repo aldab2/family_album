@@ -13,6 +13,7 @@ import {
 const FriendRequest = ({receivedRequests}) => {
 console.log(receivedRequests)
 
+
    return (
       <>
          <div id="content-page" className="content-page">           
@@ -48,6 +49,8 @@ export default FriendRequest
 const Request = ({ request }) => {
    // Safely extract senderFamily, considering it might be undefined
    const { senderFamily } = request;
+   const friendProfilePath = `/dashboard/app/friend-profile?familyId=${request?.senderFamily._id}`;
+
    const [acceptFriendRequest, { isLoading: isAccepting }] = useAcceptFriendRequestMutation();
    const [rejectFriendRequest, { isLoading: isRejecting }] = useRejectFriendRequestMutation();
  
@@ -82,7 +85,9 @@ const Request = ({ request }) => {
    return (
       <li className="d-flex align-items-center justify-content-between flex-wrap">
         <div className="flex-grow-1 ms-3">
-          <Link to="#">{request.senderFamily.spaceName}</Link>
+          <Link to={friendProfilePath} style={{ cursor: 'pointer' }}>
+          {request.senderFamily.spaceName}
+        </Link>
           {/* <h4>{request.senderFamily.spaceName}</h4> */}
           {request.senderFamily.familyMembers
             .filter((member) => member.role === "parent")

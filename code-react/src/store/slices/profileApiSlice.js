@@ -8,8 +8,8 @@ export const profileApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         
         getUserInfo: builder.query({
-            query: ()=> ({
-                url: `${USER_URL}`,
+            query: (userId)=> ({
+                url: userId ? `${USER_URL}?userId=${userId}` : USER_URL,
                 method: 'GET'
             })
         }),
@@ -44,8 +44,8 @@ export const profileApiSlice = apiSlice.injectEndpoints({
         }),
 
         getFamilyMembers: builder.query({
-            query: ()=> ({
-                url: `${FAMILY_URL}`,
+            query: (familyId)=> ({
+                url: familyId ? `${FAMILY_URL}?familyId=${familyId}`: FAMILY_URL,
                 method: 'GET'
             })
         }),
