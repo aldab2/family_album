@@ -42,17 +42,29 @@ const VerticalNav = React.memo(() => {
             </Link>
         </li>
 
-        {/* Timeline */}
+        {/* Family Space */}
         <li className={`${location.pathname === '/dashboard/app/timeline' ? 'active' : ''} nav-item`}>
             <Link className="nav-link" to="/dashboard/app/timeline">
-                <OverlayTrigger placement="right" overlay={<Tooltip>Timeline</Tooltip>}>
+                <OverlayTrigger placement="right" overlay={<Tooltip>Family Space</Tooltip>}>
                     <span>
                         <i className="icon material-symbols-outlined">schedule</i>
                     </span>
                 </OverlayTrigger>
-                <span className="item-name">Timeline</span>
+                <span className="item-name">Family Space</span>
             </Link>
         </li>
+        {/* Commmunity Space */}
+        <li className={`${location.pathname === '/dashboard/app/timeline' ? 'active' : ''} nav-item`}>
+            <Link className="nav-link" to="/dashboard/app/community-timeline">
+                <OverlayTrigger placement="right" overlay={<Tooltip>Commmunity Space</Tooltip>}>
+                    <span>
+                        <i className="icon material-symbols-outlined">people</i>
+                    </span>
+                </OverlayTrigger>
+                <span className="item-name">Commmunity Space</span>
+            </Link>
+        </li>
+        
 
         {/* Gallery */}
         <li hidden className={`${location.pathname === '/dashboard/app/gallery' ? 'active' : ''} nav-item`}>

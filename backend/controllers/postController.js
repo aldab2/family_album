@@ -113,7 +113,6 @@ const getPost = asyncHandler(async (req, res) => {
 
     // Initialize the query object
     let query = {};
-
     // Check for 'userId' filter
     if (req.query.onlyMyPosts == 'true') {
         query.userId = req.user.id;
@@ -145,9 +144,8 @@ const getPost = asyncHandler(async (req, res) => {
 
     const postsWithMediaUrls = await Promise.all(posts.map(async (post) => {
         const mediaUrls = await Promise.all(post.media.map(async (media) => {
-            console.log(req.user.family, post.author, post._id.toString(), media)
 
-            return await getPresignedUrl(req.user.family, post.author, post._id.toString(), media);
+            return await getPresignedUrl(post.family, post.author, post._id.toString(), media);
         }));
         return { ...post.toObject(), mediaUrls };
     }));
