@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import ConfirmModal from './ConfirmModal';
 
-export function FamilyMember({ member, updateUser, deleteUser, family, onSetFamily }) {
+export function FamilyMember({ member, updateUser, deleteUser, family, onSetFamily , viewOnly}) {
     const [isEditMode, setIsEditMode] = useState(false); // Track edit mode
     const [editMember, setEditMember] = useState(member); // State for editing member
     const [showConfirm, setShowConfirm] = useState(false);
@@ -85,7 +85,7 @@ export function FamilyMember({ member, updateUser, deleteUser, family, onSetFami
                 </Card.Header>
                 <Card.Body>
                     <Form onSubmit={handleSubmit}>
-                        <div className="d-flex justify-content-end">
+                        {!viewOnly && <div className="d-flex justify-content-end">
                             <Button type="button" className="btn btn-primary me-2 edit-button" onClick={toggleEditMode}>Edit</Button>
                             <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
 
@@ -94,7 +94,7 @@ export function FamilyMember({ member, updateUser, deleteUser, family, onSetFami
                                 onHide={() => setShowConfirm(false)}
                                 onConfirm={handleDelete}
                                 message={`Are you sure you want to delete ${member.userName}?`} />
-                        </div>
+                        </div>}
 
 
 

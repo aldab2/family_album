@@ -105,6 +105,7 @@ export default AddFriend
 
 
 const Pending = ({ pendingRequest }) => {
+  const friendProfilePath = `/dashboard/app/friend-profile?familyId=${pendingRequest?.recipientFamily._id}`;
   // Adjusted to use Bootstrap's Row and Col for layout
   return (
     <Col md={6}>
@@ -117,7 +118,10 @@ const Pending = ({ pendingRequest }) => {
                   <div className="profile-detail d-flex">
                     <div className="user-data-block">
                       <h4>
-                        <Link to="#">{pendingRequest.recipientFamily.spaceName}</Link>
+                        <Link to="#"></Link>
+                        <Link to={friendProfilePath} style={{ cursor: 'pointer' }}>
+                        {pendingRequest.recipientFamily.spaceName}
+        </Link>
                       </h4>
                       {/* Display only family members with the role of parent */}
                       {pendingRequest.recipientFamily.familyMembers.filter(member => member.role === "parent").map((parent, index) => (
