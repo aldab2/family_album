@@ -3,7 +3,7 @@ import { Row, Card, Tab, Form, Button } from 'react-bootstrap';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-export function FamilyInfo({ family, onSetFamily, editFamilyProfile, addFamilyMember }) {
+export function FamilyInfo({ family, onSetFamily, editFamilyProfile, addFamilyMember, viewOnly }) {
 
     // Initialize state for edit mode and edited space name
     const [isEditMode, setIsEditMode] = useState(false);
@@ -126,7 +126,7 @@ export function FamilyInfo({ family, onSetFamily, editFamilyProfile, addFamilyMe
                             <strong>Updated At:</strong> {formattedUpdatedAt}
                         </div>
 
-                        <div className="d-flex justify-content-end">
+                       {!viewOnly && <div className="d-flex justify-content-end">
                             {isEditMode ? (
                                 <>
                                     <Button onClick={handleSave} className="btn btn-success me-2">Save</Button>
@@ -138,7 +138,7 @@ export function FamilyInfo({ family, onSetFamily, editFamilyProfile, addFamilyMe
                                     <Button variant="success" onClick={handleAddMemberShow} className="me-2">Add Member</Button>
                                 </>
                             )}
-                        </div>
+                        </div>}
                         {showAddMemberForm && (
                             <Card className="mt-3">
                                 <Card.Header>Add New Family Member</Card.Header>
@@ -236,7 +236,7 @@ export function FamilyInfo({ family, onSetFamily, editFamilyProfile, addFamilyMe
                                         </Row>
 
                                         <div className="d-flex justify-content-end mt-2">
-                                            <Button type="submit" variant="primary" className="me-2" onClick={handleAddMemberSubmit}>Add Member</Button>
+                                            <Button  type="submit" variant="primary" className="me-2" onClick={handleAddMemberSubmit}>Add Member</Button>
                                             <Button variant="secondary" onClick={handleAddMemberHide}>Cancel</Button>
                                         </div>
                                     </Card>

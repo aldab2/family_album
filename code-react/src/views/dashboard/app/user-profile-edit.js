@@ -9,19 +9,24 @@ import { UserInfo } from './UserInfo';
 import { ChangePassword } from './ChangePassword';
 import { FamilyInfo } from './FamilyInfo';
 import { FamilyMember } from './FamilyMember';
+import { useLocation } from 'react-router-dom';
 
 
 
 
 
-
-const UserProfileEdit =() =>{
-
+const UserProfileEdit =({}) =>{
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const familyId = queryParams.get('familyId');
+    
     const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
     const { data: userInfo, refetch } = useGetUserInfoQuery();
-    const { data: familyQueryResult, isLoading, isError, error } = useGetFamilyMembersQuery();
+    const { data: familyQueryResult, isLoading, isError, error } = useGetFamilyMembersQuery(familyId || null);
     const [editFamilyProfile, { isLoading: isEditing }] = useEditFamilyProfileMutation();
     const [addFamilyMember, { isLoading: isAdding }] = useAddFamilyMemberMutation();
+    
+
 
     // console.log("the Family: ", family)
     // const { userInfo } = useSelector((state) => state.authReducer);
@@ -49,13 +54,13 @@ const UserProfileEdit =() =>{
   return(
       <>
         <Container>
-            <Tab.Container defaultActiveKey="first">
+            <Tab.Container defaultActiveKey={family?"third":"first"}>
           <Row>
               <Col lg="12">
                   <Card>
                       <Card.Body className="p-0">
                           <div>
-                              <Nav as="ul" variant="pills" className="iq-edit-profile row">
+                              <Nav hidden={familyId!= null} as="ul" variant="pills" className="iq-edit-profile row">
                                   <Nav.Item as="li" className="col-sm p-0">
                                       <Nav.Link  eventKey="first" role="button">
                                           Personal Information
@@ -91,11 +96,11 @@ const UserProfileEdit =() =>{
                             <ChangePassword />
                         </Tab.Pane>
 
+                        
                         <Tab.Pane eventKey="third" className="fade show">
-                          <FamilyInfo family= {family} onSetFamily = {setFamily} editFamilyProfile={editFamilyProfile} addFamilyMember ={addFamilyMember}  />
-                        </Tab.Pane>
-                        <Tab.Pane eventKey="third" className="fade show">
-                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = {deleteUser} family={family} onSetFamily={setFamily}/>)}
+                        <FamilyInfo family= {family} onSetFamily = {setFamily} editFamilyProfile={editFamilyProfile} addFamilyMember ={addFamilyMember} viewOnly={familyId? true:false}  />
+
+                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = {deleteUser} family={family} onSetFamily={setFamily} viewOnly={familyId? true:false}/>)}
                         </Tab.Pane>
 
                           {/* <ManageContact />    */}

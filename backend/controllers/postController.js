@@ -135,15 +135,18 @@ const getPost = asyncHandler(async (req, res) => {
         // Default to family
         query.family = req.user.family;
     }
-
+   
     const posts = await Post.find(query)
                             .skip(skip)
                             .limit(limit)
                             .sort({ createdAt: -1 })
                             .populate('comments');
+     console.log(posts)
 
     const postsWithMediaUrls = await Promise.all(posts.map(async (post) => {
         const mediaUrls = await Promise.all(post.media.map(async (media) => {
+            console.log(req.user.family, post.author, post._id.toString(), media)
+
             return await getPresignedUrl(req.user.family, post.author, post._id.toString(), media);
         }));
         return { ...post.toObject(), mediaUrls };

@@ -4,6 +4,7 @@ import Card from '../../../components/Card'
 import {Link} from 'react-router-dom'
 import { useDeleteFriendRequestMutation } from '../../../store/slices/friendsApiSlice';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 //profile-header
 import ProfileHeader from '../../../components/profile-header'
@@ -12,9 +13,11 @@ import img3 from '../../../assets/images/page-img/profile-bg3.jpg'
 
 
 
-const FriendList = ({ familyFriends }) => {
+const FriendList = ({ familyFriends , refetchFriends}) => {
     if (!familyFriends) return <div>Loading friends...</div>;
+
     
+
     return (
         <>
             <ProfileHeader title="Friend Lists" img={img3}/>
@@ -22,7 +25,7 @@ const FriendList = ({ familyFriends }) => {
                 <Container>
                     <Row>
                         {familyFriends.map(friend => (
-                            <Friend key={friend._id} friend={friend} />
+                            <Friend key={friend._id} friend={friend} refetchFriends={refetchFriends}/>
                         ))}
                     </Row>
                 </Container>
@@ -31,7 +34,10 @@ const FriendList = ({ familyFriends }) => {
     );
 };
 
-const Friend = ({ friend  }) => {
+const Friend = ({ friend ,refetchFriends }) => {
+    const friendProfilePath = `/dashboard/app/friend-profile?familyId=${friend._id}`;
+
+
     // console.log(familyFriends)
     const [deleteFriendRequest, { isLoading: isDeleting }] = useDeleteFriendRequestMutation();
 
@@ -39,7 +45,8 @@ const Friend = ({ friend  }) => {
         try {
             // Assuming the API needs the friend's ID to remove them
             await deleteFriendRequest({ toRemoveId: friend._id }).unwrap();
-            toast.error('Friend removed successfully.');
+            refetchFriends();
+            toast.success('Friend removed successfully.');
         } catch (err) {
             console.error('Failed to remove friend:', err);
             toast.error('Failed to remove friend.');
@@ -56,7 +63,9 @@ const Friend = ({ friend  }) => {
                                     <div className="profile-detail d-flex">
                                         <div className="user-data-block">
                                             <h4>
-                                                <Link to="#">{friend?.spaceName}</Link>
+                                            <Link to={friendProfilePath} style={{ cursor: 'pointer' }}>
+            {friend?.spaceName}
+        </Link>
                                             </h4>
                                             {/* Display only family members with the role of parent */}
                                             {friend?.familyMembers?.filter(member => member.role === "parent").map((parent, index) => (

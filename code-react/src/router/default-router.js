@@ -101,10 +101,6 @@ export const DefaultRouter = [
     element: <UserPrivacySetting />,
   },
   {
-    path: "dashboard/app/friend-profile",
-    element: <FriendProfile />,
-  },
-  {
     path: "dashboard/app/profile-badges",
     element: <ProfileBadges />,
   },
@@ -135,6 +131,10 @@ export const DefaultRouter = [
   {
     path: "dashboard/app/user-profile-edit",
     element: <UserProfileEdit />,
+  },
+  {
+    path: "dashboard/app/friend-profile",
+    element: (() => <UserProfileEdit familyId="someValue" />)(),
   },
   {
     path: "dashboard/icon/fontawesome-5",
