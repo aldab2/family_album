@@ -79,7 +79,8 @@ const sendVerificationEmail = (req, res, next) => {
     if (error) {
       console.error('Error sending email: ', error);
     } else {
-      console.log('Email sent smtp: ' + info.response);
+      console.log('Email sent successfully , smpt: ' + info.response);
+      //console.log('Email sent smtp: ' + info.response);
       
     }
   });
