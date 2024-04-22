@@ -36,39 +36,52 @@ const login = asyncHandler(async (req, res) => {
 * @access Public
 *  @type {import("express").RequestHandler} */
 const registerFamily = asyncHandler(async (req, res) => {
-  const familyCreateDTO = new FamilyCreateDTO(req.body);
-
-  const userExists = await User.findOne({ userName: familyCreateDTO.userName });
-  if (userExists) {
-    res.status(400);
-    throw new Error('User already exsits');
-  }
-
-  const user = await User.create({
-    ...familyCreateDTO,
-    role: 'parent',
-    //avtive false in log in check if active or not 
-    active: false,
-    activationCode: getRandomActivationCode()
-  })
-  const family = await Family.create({
-    spaceName: familyCreateDTO.spaceName,
-    familyMembers: [user._id]
-  })
-
-  await User.updateOne({ _id: user._id }, { $set: { family: family._id } });
-
-  if (user) {
-    generateToken(res, user._id);
-    family.familyMembers = [user];
-    const familyReadDto = new FamilyReadDTO(family);
-   req.user = user;
-    //await sendVerificationEmail(req, res);
-    res.status(201).json(familyReadDto);
-  }
-  else {
-    res.status(400);
-    throw new Error("Invalid User Data");
+  
+  try {
+    
+    const familyCreateDTO = new FamilyCreateDTO(req.body);
+  
+    const userExists = await User.findOne({ userName: familyCreateDTO.userName });
+    if (userExists) {
+      res.status(400);
+      throw new Error('User already exsits');
+    }
+    const familyExists = await Family.findOne({spaceName: familyCreateDTO.spaceName})
+    if (familyExists) {
+      res.status(400);
+      throw new Error('Family already exsits');
+    }
+  
+    const user = await User.create({
+      ...familyCreateDTO,
+      role: 'parent',
+      //avtive false in log in check if active or not 
+      active: false,
+      activationCode: getRandomActivationCode()
+    })
+    const family = await Family.create({
+      spaceName: familyCreateDTO.spaceName,
+      familyMembers: [user._id]
+    })
+  
+    await User.updateOne({ _id: user._id }, { $set: { family: family._id } });
+  
+    if (user) {
+      generateToken(res, user._id);
+      family.familyMembers = [user];
+      const familyReadDto = new FamilyReadDTO(family);
+     req.user = user;
+      //await sendVerificationEmail(req, res);
+      res.status(201).json(familyReadDto);
+    }
+    else {
+      res.status(400);
+      throw new Error("Invalid User Data");
+    }
+  } catch (error) {
+    res.status(400)
+    throw new Error(error)
+    
   }
 });
 
@@ -79,9 +92,17 @@ const registerFamily = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getFamilyProfile = asyncHandler(async (req, res) => {
-  const familyId = req.user.family;
-  const familyReadDto = new FamilyReadDTO(await Family.findOne({ _id: familyId }).populate('familyMembers'));
-  res.status(200).json(familyReadDto);
+  const familyId = req.query.familyId || req.user.family;
+  const familyObject = await Family.findOne({ _id: familyId }).populate('familyMembers');
+  if(familyObject){
+
+    const familyReadDto = new FamilyReadDTO(familyObject);
+    res.status(200).json(familyReadDto);
+  }
+  else {
+    res.status(400)
+    throw new Error("Family not found")
+  }
 });
 
 /**
@@ -218,9 +239,10 @@ const addFamilyMember = asyncHandler(async (req, res) => {
 * @access Private
 *  @type {import("express").RequestHandler} */
 const getUserProfile = asyncHandler(async (req, res) => {
-  let userInfo = {...req.user}
-  delete userInfo.activationCode;
-  res.status(200).send(userInfo);
+  const userId = req.query.userId || req.user.id
+  const userReadDTO = new UserReadDTO(await User.findOne({ _id: userId }));
+  res.status(200).json(userReadDTO);
+
 });
 
 

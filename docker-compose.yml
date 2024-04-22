@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ./database/db:/data/db
+    ports:
+      - "27017:27017"  # Map the container's port 27017 to the host's port 27017
+    networks:
+      - app-network
+
+  minio:
+    image: quay.io/minio/minio
+    command: server /mnt/data --console-address ":9090"
+    volumes:
+      - ./object_storage/data:/mnt/data
+      - ./object_storage/config.env:/etc/config.env
+    env_file:
+      - ./object_storage/config.env
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    networks:
+      - app-network
+
+  backend:
+    image: abbarnawi/family-space-backend:v1.2
+    build: ./backend/
+    env_file:
+      - ./backend/.dockerenv
+    depends_on:
+      - mongo
+      - minio
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  frontend:
+    image: abbarnawi/family-space-frontend:latest
+    build: ./code-react/
+    volumes:
+      - ./code-react/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

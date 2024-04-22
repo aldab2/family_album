@@ -22,7 +22,7 @@ import { timeAgo } from '../../../utilities/general'
 
 
 
-const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
+const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
     const [addComment, { isLoading: isAddingComment }] = useAddCommentMutation();
     const [deleteComment] = useDeleteCommentMutation();
     const [commentContent, setCommentContent] = useState('');
@@ -449,7 +449,7 @@ const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
                                                                     <p className="mb-0 text-secondary">{timeAgo(post.createdAt)}</p>
                                                                 </div>
                                                                 <div className="card-post-toolbar">
-                                                        <Dropdown>
+                                                        {post.family=== userInfo.family && <Dropdown>
                                                             <Dropdown.Toggle variant="bg-transparent">
                                                             <span className="material-symbols-outlined">
                                                                 more_horiz
@@ -495,7 +495,7 @@ const PostsTimeline = ({type = "all" , onlyMyPosts = false }) => {
                                                                         </div>
                                                                     </Dropdown.Item>
                                                                 </Dropdown.Menu>
-                                                            </Dropdown>
+                                                            </Dropdown> } 
                                                         </div>
                                                             </div>
                                                         </div>

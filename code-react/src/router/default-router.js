@@ -78,6 +78,7 @@ import TermsofService from "../views/dashboard/extrapages/terms-of-service";
 import BlankPage from "../views/dashboard/extrapages/blankpage";
 import Admin from "../views/dashboard/app/admin";
 import Gallery from "../views/dashboard/app/gallery";
+import Community from "../views/dashboard/app/community";
 
 export const DefaultRouter = [
   {
@@ -87,6 +88,10 @@ export const DefaultRouter = [
   {
     path: "/dashboard/app/timeline",
     element: <Index />,
+  },
+  {
+    path: "/dashboard/app/community-timeline",
+    element: <Community />,
   },
   {
     path: "/dashboard/app/gallery",
@@ -99,10 +104,6 @@ export const DefaultRouter = [
   {
     path: "dashboard/app/user-privacy-setting",
     element: <UserPrivacySetting />,
-  },
-  {
-    path: "dashboard/app/friend-profile",
-    element: <FriendProfile />,
   },
   {
     path: "dashboard/app/profile-badges",
@@ -135,6 +136,10 @@ export const DefaultRouter = [
   {
     path: "dashboard/app/user-profile-edit",
     element: <UserProfileEdit />,
+  },
+  {
+    path: "dashboard/app/friend-profile",
+    element: (() => <UserProfileEdit familyId="someValue" />)(),
   },
   {
     path: "dashboard/icon/fontawesome-5",
