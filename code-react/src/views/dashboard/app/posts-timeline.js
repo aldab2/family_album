@@ -169,38 +169,36 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
         if (selectedFile && postText) {
           const formData = new FormData();
           formData.append("file", selectedFile);
-          formData.append("content",postText);
-
+          formData.append("content", postText);
+    
           switch(selectedPostVisibility) {
             case 'Family Members':
-              formData.append("visibility","private")
+              formData.append("visibility", "private");
               break;
             case 'Family Friends':
-                formData.append("visibility","friends")
+              formData.append("visibility", "friends");
               break;
             case 'Public':
-                formData.append("visibility","public")
+              formData.append("visibility", "public");
               break;
-              default:
-                toast.error("Unknown Visibility Option",selectedPostVisibility)
-                break
+            default:
+              toast.error("Unknown Visibility Option", selectedPostVisibility);
+              break;
           }
-
-          const postResult = await addPost(formData).unwrap();
-
-          if(addPostError && !isAddPostLoading){
-            toast.error(addPostError);
-          }
-          else {
-            setPosts(prevPosts=>[postResult,...prevPosts]);
-            toast.success("Postt Added");
+    
+          try {
+            const postResult = await addPost(formData).unwrap();
+            setPosts(prevPosts => [postResult, ...prevPosts]);
+            toast.success("Post Added");
             handleClose();
+          } catch (error) {
+            toast.error("Failed to add post");
           }
+        } else {
+          toast.info("Fields Missing");
         }
-        else {
-            toast.info("Fields Missing")
-        }
-      };
+    };
+    
 
       const handleDeletePost = async (postToDelete) => {
         try {
@@ -410,7 +408,12 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button type="button" onClick={handlePostButton} className="btn btn-primary d-block w-100 mt-3">Post</button>
+                                            <div className="d-flex justify-content-center">
+                                                {isAddPostLoading && <img src={loader} alt="Loading..." style={{ width: '50px' }} />}
+                                            </div>
+                                            <button type="button" onClick={handlePostButton} className="btn btn-primary d-block w-100 mt-3" disabled={isAddPostLoading}>
+                                                {isAddPostLoading ? 'Posting...' : 'Post'}
+                                            </button>
                                         </Modal.Body>
                                     </Modal>
 
