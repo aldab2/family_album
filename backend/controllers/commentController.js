@@ -58,21 +58,46 @@ const  editComment = asyncHandler(async(req, res) => {
 })
 
 
+// async function deleteComment(req, res) {
+//     const {
+//         id
+//     } = req.body
+//     try {
+//         let mdb = await Comment.findOneAndDelete({id})
+//         await Post.findOneAndUpdate(
+//             { _id: postId },
+//             { $pull: { comments: newComment._id } },
+//         )
+//         res.json(mdb)
+//     } catch (error) {
+//         res.json(error)
+//     }
+// }
+
+
 async function deleteComment(req, res) {
-    const {
-        id
-    } = req.body
+    const { id } = req.body;  // Extracting `id` from `req.body`
     try {
-        let mdb = await Comment.findOneAndDelete({id})
-        await Post.findOneAndUpdate(
-            { _id: postId },
-            { $pull: { comments: newComment._id } },
-        )
-        res.json(mdb)
+        let deletedComment = await Comment.findOneAndDelete({ _id: id });
+        if (deletedComment) {
+            await Post.findOneAndUpdate(
+                { _id: deletedComment.postId },  // Assuming `postId` is stored on the comment
+                { $pull: { comments: id } }
+            );
+            res.json({ message: "Comment deleted successfully" });
+        } else {
+            res.status(404)
+            throw new Error("Comment not found");
+        }
     } catch (error) {
-        res.json(error)
+        console.error(error);
+        res.status(500)
+        throw new Error(error)
     }
 }
+
+
+
 
 
 export {
