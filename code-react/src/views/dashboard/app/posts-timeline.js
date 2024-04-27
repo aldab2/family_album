@@ -24,18 +24,37 @@ import { timeAgo } from '../../../utilities/general'
 
 const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
     const [addComment, { isLoading: isAddingComment }] = useAddCommentMutation();
+    const [deleteComment] = useDeleteCommentMutation();
     const [commentContent, setCommentContent] = useState('');
+
+    const [expandedPostId, setExpandedPostId] = useState(null);
+    const toggleComments = (postId) => {
+        setExpandedPostId(expandedPostId === postId ? null : postId);
+    };
+    
+
+
     const handleSubmitComment = async (postId) => {
         try {
-          await addComment({ content: commentContent, postId }).unwrap();
-          setCommentContent(''); // Clear the comment input field after successful submission
-          toast.success('Comment added successfully');
-          // Optionally, refresh comments or the post here
+            const newComment = await addComment({ content: commentContent, postId }).unwrap();
+            setCommentContent(''); // Clear the comment input field
+            toast.success('Comment added successfully');
+    
+            // Update local posts state to include the new comment
+            setPosts(currentPosts =>
+                currentPosts.map(post => {
+                    if (post._id === postId) {
+                        // Add the new comment to this post's comments
+                        return { ...post, comments: [...post.comments, newComment] };
+                    }
+                    return post;
+                })
+            );
         } catch (error) {
-          console.error('Failed to add comment:', error);
-          toast.error('Failed to add comment');
+            console.error('Failed to add comment:', error);
+            toast.error('Failed to add comment');
         }
-      };
+    };
       
 
 
@@ -150,38 +169,36 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
         if (selectedFile && postText) {
           const formData = new FormData();
           formData.append("file", selectedFile);
-          formData.append("content",postText);
-
+          formData.append("content", postText);
+    
           switch(selectedPostVisibility) {
             case 'Family Members':
-              formData.append("visibility","private")
+              formData.append("visibility", "private");
               break;
             case 'Family Friends':
-                formData.append("visibility","friends")
+              formData.append("visibility", "friends");
               break;
             case 'Public':
-                formData.append("visibility","public")
+              formData.append("visibility", "public");
               break;
-              default:
-                toast.error("Unknown Visibility Option",selectedPostVisibility)
-                break
+            default:
+              toast.error("Unknown Visibility Option", selectedPostVisibility);
+              break;
           }
-
-          const postResult = await addPost(formData).unwrap();
-
-          if(addPostError && !isAddPostLoading){
-            toast.error(addPostError);
-          }
-          else {
-            setPosts(prevPosts=>[postResult,...prevPosts]);
-            toast.success("Postt Added");
+    
+          try {
+            const postResult = await addPost(formData).unwrap();
+            setPosts(prevPosts => [postResult, ...prevPosts]);
+            toast.success("Post Added");
             handleClose();
+          } catch (error) {
+            toast.error("Failed to add post");
           }
+        } else {
+          toast.info("Fields Missing");
         }
-        else {
-            toast.info("Fields Missing")
-        }
-      };
+    };
+    
 
       const handleDeletePost = async (postToDelete) => {
         try {
@@ -197,6 +214,59 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
             toast.success("Post Deleted Successfully");
         } catch (deletePostError) {
             toast.error(deletePostError.toString());
+        }
+    };
+
+    
+
+    // const handleDeleteComment = async (commentId, postId) => {
+    //     try {
+    //         console.log("Deleting comment ID:", commentId);
+    //         await deleteComment({ id: commentId }).unwrap();
+    //         toast.success('Comment deleted successfully');
+    //         // Update local posts state to remove the comment
+    //         setPosts(currentPosts => currentPosts.map(post => {
+    //             if (post._id === postId) {
+    //                 const filteredComments = post.comments.filter(comment => comment._id !== commentId);
+    //                 return { ...post, comments: filteredComments };
+    //             }
+    //             return post;
+    //         }));
+    //     } catch (error) {
+    //         console.error('Failed to delete comment:', error);
+    //         toast.error('Failed to delete comment');
+    //     }
+    // };
+
+    const handleDeleteComment = async (commentId, postId) => {
+        try {
+            console.log("Deleting comment ID:", commentId);
+            const response = await deleteComment({ id: commentId }).unwrap();
+            console.log("Delete response:", response);  // Log the response to see what comes back from the server
+    
+            // Deep clone and update local posts state to remove the comment
+            console.log("About to delete comment from post ID:", postId);
+            setPosts(currentPosts => {
+                
+                const updatedPosts = currentPosts.map(post => {
+                    console.log("Current post ID:", post._id, "Target post ID:", postId);
+                    if (post._id === postId) {
+                        console.log("Comments before filtering:", post.comments);
+                        console.log("Attempting to delete comment ID:", commentId); 
+                        const filteredComments = post.comments.filter(comment => comment._id !== commentId);
+                        // Create a deep clone of the post to ensure React recognizes the change
+                        return { ...post, comments: [...filteredComments] };
+                    }
+                    return { ...post };
+                });
+                console.log("Updated posts after deletion:", updatedPosts);  // Log to check if the comments are filtered correctly
+                return updatedPosts;
+            });
+    
+            toast.success('Comment deleted successfully');
+        } catch (error) {
+            console.error('Failed to delete comment:', error);
+            toast.error('Failed to delete comment');
         }
     };
    
@@ -225,20 +295,20 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                         <hr></hr>
                                         <ul className=" post-opt-block d-flex list-inline m-0 p-0 flex-wrap">
                                         <li className="me-3 mb-md-0 mb-2">
-    <input 
-        type="file" 
-        id="file-upload" 
-        style={{ display: 'none' }} 
-        onChange={handleFileChange} // Add a handler for file selection
-        accept="image/*,video/*" // Accept images and videos
-    />
-    <button 
-        className="btn btn-soft-primary" 
-        onClick={() => document.getElementById('file-upload').click()}
-    >
-        <img src={img1} alt="icon" className="img-fluid me-2" /> Photo/Video
-    </button>
-</li>
+                                            <input 
+                                                type="file" 
+                                                id="file-upload" 
+                                                style={{ display: 'none' }} 
+                                                onChange={handleFileChange} // Add a handler for file selection
+                                                accept="image/*,video/*" // Accept images and videos
+                                            />
+                                            <button 
+                                                className="btn btn-soft-primary" 
+                                                onClick={() => document.getElementById('file-upload').click()}
+                                            >
+                                                <img src={img1} alt="icon" className="img-fluid me-2" /> Photo/Video
+                                            </button>
+                                        </li>
                                         </ul>
                                     </Card.Body>
                                     <Modal size="lg" className="fade" id="post-modal" onHide={handleClose} show={show} >
@@ -338,7 +408,12 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button type="button" onClick={handlePostButton} className="btn btn-primary d-block w-100 mt-3">Post</button>
+                                            <div className="d-flex justify-content-center">
+                                                {isAddPostLoading && <img src={loader} alt="Loading..." style={{ width: '50px' }} />}
+                                            </div>
+                                            <button type="button" onClick={handlePostButton} className="btn btn-primary d-block w-100 mt-3" disabled={isAddPostLoading}>
+                                                {isAddPostLoading ? 'Posting...' : 'Post'}
+                                            </button>
                                         </Modal.Body>
                                     </Modal>
 
@@ -434,9 +509,9 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                 </div>
                                                 <div className="user-post">
 
-                                                    {getMediaType(post.media[0]) == 'image' && <Link to="#"><img src={post.mediaUrls[0]} alt="post1" className="img-fluid rounded w-100" /></Link>}
+                                                    {getMediaType(post.media[0]) === 'image' && <Link to="#"><img src={post.mediaUrls[0]} alt="post1" className="img-fluid rounded w-100" /></Link>}
 
-                                                    {getMediaType(post.media[0]) == 'video' && <div className="ratio ratio-16x9">
+                                                    {getMediaType(post.media[0]) === 'video' && <div className="ratio ratio-16x9">
                                                         <video controls>
                                                             <source src={post.mediaUrls[0]} type="video/mp4" />
                                                             Your browser does not support the video tag.
@@ -451,40 +526,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                     <div className="d-flex justify-content-between align-items-center flex-wrap">
                                                         <div className="like-block position-relative d-flex align-items-center">
                                                             <div className="d-flex align-items-center">
-                                                                {/* <div className="like-data">
-                                            <Dropdown>
-                                                <Dropdown.Toggle  as={CustomToggle} >
-                                                    <img src={icon2} className="img-fluid" alt=""/>
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu className=" py-2">
-                                                <OverlayTrigger placement="top" overlay={<Tooltip>Love</Tooltip>} className="me-2" ><img src={icon2} className="img-fluid me-2" alt=""/></OverlayTrigger>                                                                    <OverlayTrigger placement="top" overlay={<Tooltip>Love</Tooltip>} className="me-2" ><img src={icon2} className="img-fluid me-2" alt=""/></OverlayTrigger>
-                                                    <OverlayTrigger placement="top" overlay={<Tooltip>Happy</Tooltip>} className="me-2" ><img src={icon3} className="img-fluid me-2" alt=""/></OverlayTrigger>
-                                                    <OverlayTrigger placement="top" overlay={<Tooltip>HaHa</Tooltip>} className="me-2" ><img src={icon4} className="img-fluid me-2" alt=""/></OverlayTrigger>
-                                                    <OverlayTrigger placement="top" overlay={<Tooltip>Think</Tooltip>} className="me-2" ><img src={icon5} className="img-fluid me-2" alt=""/></OverlayTrigger>
-                                                    <OverlayTrigger placement="top" overlay={<Tooltip>Sade</Tooltip>} className="me-2" ><img src={icon6} className="img-fluid me-2" alt=""/></OverlayTrigger>
-                                                    <OverlayTrigger placement="top" overlay={<Tooltip>Lovely</Tooltip>} className="me-2" ><img src={icon7} className="img-fluid me-2" alt=""/></OverlayTrigger> 
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                            
-                                        </div> */}
-
-
-
-
-                                                                {/* implement the Like starategy here  */}
-                                                                {/* <div className="like-data">
-                                                                    <Dropdown.Toggle as={CustomToggle} >
-                                                                        <img src={icon2} className="img-fluid" alt="" />
-                                                                    </Dropdown.Toggle>
-                                                                </div>
-                                                                <div className="total-like-block ms-2 me-3">
-                                                                    <Dropdown>
-                                                                        <Dropdown.Toggle as={CustomToggle} id="post-option" >
-                                                                            {post.numOfLikes} Likes   {post.numOfComments} Comments
-                                                                        </Dropdown.Toggle>
-
-                                                                    </Dropdown>
-                                                                </div> */}
+                                                                
                                                             </div>
 
                                                         </div>
@@ -494,37 +536,41 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
 
                                                     {/* comments  */}
                                                     <ul className="post-comments list-inline p-0 m-0">
-                                                        {post.comments.map((comment, index) => {
-                                                            return <li key={index} className="mb-2">
-                                                                <div className="d-flex">
-                                                                    {/* <div className="user-img">
-                                        <img src={comment.userImage} alt="user" className="avatar-35 rounded-circle img-fluid"/>
-                                    </div> */}
+                                                        {post.comments.slice(0, expandedPostId === post._id ? post.comments.length : 2).map((comment, index) => (
+                                                            <li key={index} className="mb-2">
+                                                                <div className="d-flex justify-content-between">
                                                                     <div className="comment-data-block ms-3">
-                                                                        <h5>
-                                                                        <Link to="#">
-                                                                        {comment.author}
-                                                                        </Link>
-                                                                        </h5>
+                                                                        <h5><Link to="#">{comment.author}</Link></h5>
                                                                         <p className="mb-0">{comment.content}</p>
                                                                         <div className="d-flex flex-wrap align-items-center comment-activity">
-                                                                           
                                                                             <span>{timeAgo(comment.createdAt)}</span>
                                                                         </div>
                                                                     </div>
+                                                                    <Dropdown>
+                                                                        <Dropdown.Toggle variant="bg-transparent">
+                                                                            <span className="material-symbols-outlined">more_horiz</span>
+                                                                        </Dropdown.Toggle>
+                                                                        <Dropdown.Menu>
+                                                                            <Dropdown.Item>
+                                                                                Edit
+                                                                            </Dropdown.Item>
+                                                                            <Dropdown.Item onClick={() => handleDeleteComment(comment._id, post._id)}>
+                                                                                Delete
+                                                                            </Dropdown.Item>
+                                                                        </Dropdown.Menu>
+                                                                    </Dropdown>
                                                                 </div>
                                                             </li>
-                                                        })}
-                                                      
+                                                        ))}
+                                                        {post.comments.length > 2 && (
+                                                            <li className="mt-2">
+                                                                <Button variant="link" onClick={() => setExpandedPostId(expandedPostId === post._id ? null : post._id)}>
+                                                                    {expandedPostId === post._id ? 'Hide' : 'Show All'} Comments
+                                                                </Button>
+                                                            </li>
+                                                        )}
                                                     </ul>
-                                                    {/* <form className="comment-text d-flex align-items-center mt-3" >
-                                                        <input type="text" className="form-control rounded" placeholder="Enter Your Comment" />
-                                                        <Button variant="primary" className="m-3" type="submit">Post</Button>{' '} */}
-                                                        {/* <div className="comment-attagement d-flex">
-                                <Link to="#"><i className="ri-link me-3"></i></Link>
-                                <Link to="#"><i className="ri-user-smile-line me-3"></i></Link>
-                                <Link to="#"><i className="ri-camera-line me-3"></i></Link>
-                            </div>*/}               
+                                                                  
                                                     <form
                                                         className="comment-text d-flex align-items-center mt-3"
                                                         onSubmit={(e) => {

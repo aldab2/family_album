@@ -18,10 +18,10 @@ export const commentsApiSlice = apiSlice.injectEndpoints({
             }),
         }),
         deleteComment: builder.mutation({
-            query: (commentId) => ({
-                url: `/comment`,
+            query: ({id}) => ({
+                url: `/api/post/comment`,
                 method: 'DELETE',
-                body: { id: commentId }, // Ensure the backend expects 'id' in the body
+                body: { id }, // Ensure the backend expects 'id' in the body
             }),
         }),
     })
