@@ -50,7 +50,7 @@ const SignIn = () => {
                   <Col md="6" className="d-none d-md-block text-center pt-5">
                      <div className="sign-in-detail text-white">
                         <Link className="sign-in-logo mb-5" to="#">
-                           <Image src={logo} className="img-fluid" alt="logo" />
+                           {/* <Image src={logo} className="img-fluid large-logo" alt="logo" /> */}
                         </Link>
                         <div className="sign-slider overflow-hidden ">
                            <Swiper
@@ -62,7 +62,7 @@ const SignIn = () => {
                               }}
                               className="list-inline m-0 p-0">
                               <SwiperSlide>
-                                 <Image src={login1} className="img-fluid mb-4" alt="logo" />
+                                 <Image src={login1} className="img-fluid mb-4 " alt="logo" />
                                  <h4 className="mb-1 text-white">Preserve Family Memories</h4>
                                  <p>A platform dedicated to safeguarding precious family moments for generations to explore.</p>
                               </SwiperSlide>

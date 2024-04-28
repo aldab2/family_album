@@ -72,5 +72,23 @@
 
 
 
+.text-secondary-small {
+    font-weight: normal;
+    font-size: 10px; /* Customize size as needed */
+    color: #555;    /* Subtle color difference */
+}
+
+.large-logo {
+    width: 100px;  /* default smaller size for mobile */
+    height: auto;
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .large-logo {
+        width: 150px;  /* larger size for tablets and desktops */
+    }
+}
+
 
 

@@ -65,7 +65,7 @@ const SignUp = () => {
                     <Row className="no-gutters">
                         <Col md="6" className="d-none d-md-block text-center pt-5">
                             <div className="sign-in-detail text-white">
-                                <Link className="sign-in-logo mb-5" to="#"><Image src={logo} className="img-fluid" alt="logo"/></Link>
+                                {/* <Link className="sign-in-logo mb-5" to="#"><Image src={logo} className="img-fluid" alt="logo"/></Link> */}
                                 <div className="sign-slider overflow-hidden">
                                     <Swiper
                                         spaceBetween={30}

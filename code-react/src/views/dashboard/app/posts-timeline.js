@@ -311,7 +311,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                         </li>
                                         </ul>
                                     </Card.Body>
-                                    <Modal size="lg" className="fade" id="post-modal" onHide={handleClose} show={show} >
+                                    <Modal size="lg" className="fade " id="post-modal" onHide={handleClose} show={show} >
                                         <Modal.Header className="d-flex justify-content-between">
                                             <Modal.Title id="post-modalLabel">Create Post</Modal.Title>
                                             <Link to="#" className="lh-1" onClick={handleClose} >
@@ -448,7 +448,8 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                         <div className="w-100">
                                                             <div className="d-flex justify-content-between">
                                                                 <div>
-                                                                    <h5 className="mb-0 d-inline-block text-primary">{post.author}</h5>
+                                                                    <h5 className="mb-0 d-inline-block text-primary">{post.author} { type== "all" && <small className="mb-0 text-muted  text-secondary-small">@{post.family.spaceName}</small>}</h5>
+                                                                   
                                                                     <p className="mb-0 text-secondary">{timeAgo(post.createdAt)}</p>
                                                                 </div>
                                                                 <div className="card-post-toolbar">
@@ -540,25 +541,31 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                             <li key={index} className="mb-2">
                                                                 <div className="d-flex justify-content-between">
                                                                     <div className="comment-data-block ms-3">
-                                                                        <h5><Link to="#">{comment.author}</Link></h5>
+                                                                        <h5 className='text-primary'>{comment.author}{ type== "all" && <small className="mb-0 text-muted  text-secondary-small">@{post.family.spaceName}</small>}</h5>
                                                                         <p className="mb-0">{comment.content}</p>
                                                                         <div className="d-flex flex-wrap align-items-center comment-activity">
                                                                             <span>{timeAgo(comment.createdAt)}</span>
                                                                         </div>
                                                                     </div>
+                                                                    { ((post.author == userInfo.userName) || (comment.author == userInfo.userName)) &&
+                                                                    
                                                                     <Dropdown>
                                                                         <Dropdown.Toggle variant="bg-transparent">
                                                                             <span className="material-symbols-outlined">more_horiz</span>
                                                                         </Dropdown.Toggle>
                                                                         <Dropdown.Menu>
+                                                                            { comment.author == userInfo.userName &&
                                                                             <Dropdown.Item>
-                                                                                Edit
-                                                                            </Dropdown.Item>
+                                                                            Edit
+                                                                        </Dropdown.Item>
+                                                                            }
+                                                                            
                                                                             <Dropdown.Item onClick={() => handleDeleteComment(comment._id, post._id)}>
                                                                                 Delete
                                                                             </Dropdown.Item>
                                                                         </Dropdown.Menu>
                                                                     </Dropdown>
+                                                                    }
                                                                 </div>
                                                             </li>
                                                         ))}
