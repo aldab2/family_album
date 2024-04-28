@@ -425,8 +425,9 @@ const verifyCode = asyncHandler(async (req, res) => {
   if(req.user.active){
     res.status(400);
     throw new Error("User is already activated");
-  } 
-  if (code == req.user.activationCode) {
+  }
+  const user = await User.findOne({_id:req.user.id})
+  if (code == user.activationCode) {
   
     const user = await User.findOne({userName: req.user.userName});
     user.active = true;
@@ -434,7 +435,7 @@ const verifyCode = asyncHandler(async (req, res) => {
     res.status(200).json(new UserReadDTO(user))
   } else {
     res.status(400)
-    throw new Error("VerificationCode does not match.")
+    throw new Error(`VerificationCode does not match.` )
   }
 })
 

@@ -55,7 +55,7 @@ const Header = () => {
         <Nav
           expand="lg"
           variant="light"
-          className="nav navbar navbar-expand-lg navbar-light iq-navbar p-lg-0"
+          className="nav navbar navbar-expand-lg navbar-light iq-navbar p-lg-0 "
         >
           <Container fluid className="navbar-inner">
             <div className="d-flex align-items-center gap-3  pb-2 pb-lg-0">
@@ -98,10 +98,10 @@ const Header = () => {
             </Link>
             </div>
 
-            <ul className="navbar-nav navbar-list">
+            <ul className="navbar-nav navbar-list align-items-center">
               <Nav.Item as="li">
                 <Link to="/" className="d-flex align-items-center">
-                  <i className="material-symbols-outlined">home</i>
+                  {/* <i className="material-symbols-outlined">home</i> */}
                   <span className="mobile-text d-none ms-3">Home</span>
                 </Link>
               </Nav.Item>
@@ -216,7 +216,7 @@ const Header = () => {
                 <Dropdown.Toggle
                   href="#"
                   as={CustomToggle}
-                  variant="d-flex align-items-center"
+                  variant="search-toggle d-flex align-items-center"
                 >
                   {/* <Image
                     src={user1}
@@ -224,11 +224,12 @@ const Header = () => {
                     alt="user"
                     loading="lazy"
                   /> */}
-                  <div className="caption d-none d-lg-block">
+                   <i className="material-symbols-outlined">person</i>
+                  <div className="caption d-none d-md-block ">
                     <h6 className="mb-0 line-height">{userInfo.firstName + " " + userInfo.lastName}</h6>
                   </div>
                 </Dropdown.Toggle>
-                <Dropdown.Menu className="sub-drop caption-menu">
+                <Dropdown.Menu className="sub-drop caption-menu ">
                   <Card className="shadow-none m-0">
                     <Card.Header>
                       <div className="header-title">
@@ -236,26 +237,28 @@ const Header = () => {
                       </div>
                     </Card.Header>
                     <Card.Body className="p-0 ">
-                      <div className="d-flex align-items-center iq-sub-card border-0">
-                        <span className="material-symbols-outlined">
-                          line_style
-                        </span>
-                        <div className="ms-3">
-                          <Link to="/dashboard/app/profile" className="mb-0 h6">
-                            My Profile
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center iq-sub-card border-0">
-                        <span className="material-symbols-outlined">
-                          edit_note
-                        </span>
-                        <div className="ms-3">
-                          <Link to="/dashboard/app/user-profile-edit" className="mb-0 h6">
-                            Edit Profile
-                          </Link>
-                        </div>
-                      </div>
+                     
+                      <Link to="/dashboard/app/profile" className="text-decoration-none">
+    <div className="d-flex align-items-center iq-sub-card border-0">
+        <span className="material-symbols-outlined">
+        line_style
+        </span>
+        <div className="ms-3">
+            <span className="mb-0 h6">My Profile</span>
+        </div>
+    </div>
+</Link>
+                      <Link to="/dashboard/app/user-profile-edit" className="text-decoration-none">
+    <div className="d-flex align-items-center iq-sub-card border-0">
+        <span className="material-symbols-outlined">
+            edit_note
+        </span>
+        <div className="ms-3">
+            <span className="mb-0 h6">Edit Profile</span>
+        </div>
+    </div>
+</Link>
+
                       {/* <div className="d-flex align-items-center iq-sub-card border-0">
                         <span className="material-symbols-outlined">
                           manage_accounts

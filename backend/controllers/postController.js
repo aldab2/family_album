@@ -139,13 +139,16 @@ const getPost = asyncHandler(async (req, res) => {
                             .skip(skip)
                             .limit(limit)
                             .sort({ createdAt: -1 })
-                            .populate('comments');
+                            .populate('comments').populate({
+                                path: 'family',
+                                select: 'spaceName' // This will only populate the spaceName field from family
+                              });
      console.log(posts)
 
     const postsWithMediaUrls = await Promise.all(posts.map(async (post) => {
         const mediaUrls = await Promise.all(post.media.map(async (media) => {
 
-            return await getPresignedUrl(post.family, post.author, post._id.toString(), media);
+            return await getPresignedUrl(post.family._id, post.author, post._id.toString(), media);
         }));
         return { ...post.toObject(), mediaUrls };
     }));

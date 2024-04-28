@@ -30,7 +30,10 @@ async function addComment(req, res) {
 }
 
 const  editComment = asyncHandler(async(req, res) => {
-    const { content, Id } = req.body;
+    const { content, commentId } = req.body;
+
+
+
 
     const commentUpdate = {
         content, // Assuming 'content' is the field to be updated
@@ -39,13 +42,17 @@ const  editComment = asyncHandler(async(req, res) => {
 
     try {
         let updatedComment = await Comment.findOneAndUpdate(
-            { _id: Id }, // Use '_id' to query by ID
+            { _id: commentId }, // Use '_id' to query by ID
             commentUpdate,
             { new: true } // Return the updated document
         );
-
+        
         // Check if the comment was found and updated
         if (updatedComment) {
+            if(updatedComment.author != req.user.userName){
+                res.status(401);
+                throw new Error("Cannot edit a comment that is not yours")
+            }
             res.json(updatedComment);
         } else {
             res.status(404);
@@ -80,6 +87,10 @@ async function deleteComment(req, res) {
     try {
         let deletedComment = await Comment.findOneAndDelete({ _id: id });
         if (deletedComment) {
+            if(deletedComment.author != req.user.userName && req.user.role != 'parent'){
+                res.status(401);
+                throw new Error("You are not authorized to delete this comment")
+            }
             await Post.findOneAndUpdate(
                 { _id: deletedComment.postId },  // Assuming `postId` is stored on the comment
                 { $pull: { comments: id } }
