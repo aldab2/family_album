@@ -127,7 +127,8 @@ const getPost = asyncHandler(async (req, res) => {
     if (req.query.type === 'all') {
         const userFamily = await  Family.findOne({_id:req.user.family})
         query.$or = [
-            { family: userFamily._id },
+            //{ family: userFamily._id },
+            { family: userFamily._id,  visibility: { $in: ['friends', 'public'] } },
             { family: { $in: userFamily.friends },  visibility: { $in: ['friends', 'public'] }  }
         ];
     } else {
@@ -177,6 +178,37 @@ const editPost = asyncHandler(async (req, res)=> {
     }
 })
 
+const editPostVisibility = asyncHandler(async (req, res)=> {
+    const {
+        visibility,
+        id
+    } = req.body
+
+    if (!['friends', 'public',"private"].includes(visibility)) {
+        // Code to execute if visibility is neither 'friends' nor 'public'
+        res.status(400)
+        throw new Error("Invalid Visibility")
+    }
+    
+
+    try {
+        let post = await Post.findOne({_id: id})
+
+        if(!post){
+         res.status(400);
+         throw new Error("Post not found");
+        }
+        post.visibility = visibility;
+        await post.save()
+
+        res.json({post})
+
+        
+    } catch (error) {
+        throw new Error(error)
+    }
+})
+
 const minioUploadExample = asyncHandler(async (req, res) => {
     const file = req.file;
     console.log(file.buffer.length);
@@ -191,5 +223,6 @@ export {
     getPost,
     deletePost,
     editPost,
+    editPostVisibility,
     minioUploadExample
 }

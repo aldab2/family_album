@@ -14,7 +14,7 @@ import { useAddCommentMutation, useEditCommentMutation, useDeleteCommentMutation
 
 
 import loader from '../../../assets/images/page-img/page-load-loader.gif'
-import { useAddPostMutation, useDeletePostMutation, useGetPostsQuery, useLazyGetPostsQuery } from '../../../store/slices/postsApiSlice'
+import { useAddPostMutation, useDeletePostMutation, useEditPostVisibilityMutation, useGetPostsQuery, useLazyGetPostsQuery } from '../../../store/slices/postsApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { toast } from 'react-toastify'
@@ -24,6 +24,8 @@ import { timeAgo } from '../../../utilities/general'
 
 const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
     const [addComment, { isLoading: isAddingComment }] = useAddCommentMutation();
+    const [editPostVisibility, { isLoading: isEditingVisiblity }] = useEditPostVisibilityMutation();
+
     const [deleteComment] = useDeleteCommentMutation();
     const [commentContent, setCommentContent] = useState('');
 
@@ -91,17 +93,26 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
     }, [userInfo, triggerGetPosts, onlyMyPosts, type]); // Listen for changes to userInfo
 
     
-   
+
+
     useEffect(() => {
-        console.log("Data:", data);
-        if (data ) {
-            if (data.length === 0 ) {
+        if (data) {
+            console.log("Data:", data, "type", type,"page",page);
+            if (data.length === 0) {
                 setHasMorePosts(false);
-                if(page==1){
-                    setPosts(data)
-                }
+            } else if (page === 1) {
+                setPosts(data);  // Reset posts only if it's the first page
             } else {
-                setPosts(prevPosts => [...prevPosts, ...data]);
+                setPosts(prevPosts => {
+                    // Create a new Set to filter out duplicate posts by ID
+                    const postsById = new Map(prevPosts.map(post => [post._id, post]));
+                    data.forEach(post => {
+                        if (!postsById.has(post._id)) {
+                            postsById.set(post._id, post);
+                        }
+                    });
+                    return Array.from(postsById.values());
+                });
             }
         }
     }, [data]);
@@ -143,7 +154,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
     const fetchData = async () => {
         if (!isFetching && !error && hasMorePosts) {
             // Introduce an artificial delay
-            await new Promise(r => setTimeout(r,2000));
+            await new Promise(r => setTimeout(r,200));
     
             setPage(prevPage => {
                 const nextPage = prevPage + 1;
@@ -156,6 +167,31 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
 
     const handleSelectPostVisibility = (item) => {
         setSelectedPostVisibility(item);
+    };
+
+    const handleChangePostVisibility = async (postId,visibility) => {
+        try {
+            await editPostVisibility({ visibility: visibility, id:postId }).unwrap();
+            toast.success('Visibility Updated');
+    
+            // Update local posts state to include the new comment
+            setPosts(currentPosts =>
+                currentPosts.map(post => {
+                    if (post._id === postId) {
+                        return { ...post, visibility: visibility };  // Create a new object with the updated property
+                    }
+                    return post;
+                })
+            );
+            
+            if (type == 'all') {
+                setPosts(currentPosts => currentPosts.filter(post => post.visibility !== 'private'));
+            }
+            
+        } catch (error) {
+            console.error('Failed to add comment:', error);
+            toast.error(`Failed to update visibility: ${error}`);
+        }
     };
 
     const handleFileChange = (event) => {
@@ -375,7 +411,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                 <span className="btn btn-primary">{selectedPostVisibility}</span>
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu className=" m-0 p-0">
-                                                                <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('Family Members')}>
+                                                                <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('private')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-user-unfollow-line h4"></i>
                                                                         <div className="data ms-2">
@@ -384,7 +420,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                         </div>
                                                                     </div>
                                                                 </Dropdown.Item>
-                                                                <Dropdown.Item className="p-3" to="#" onClick={()=>handleSelectPostVisibility('Family Friends')}>
+                                                                <Dropdown.Item className="p-3" to="#" onClick={()=>handleSelectPostVisibility('friends')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-close-circle-line h4"></i>
                                                                         <div className="data ms-2">
@@ -393,7 +429,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                         </div>
                                                                     </div>
                                                                 </Dropdown.Item>
-                                                                <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('Public')}>
+                                                                {/* <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('Public')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-save-line h4"></i>
                                                                         <div className="data ms-2">
@@ -401,7 +437,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                             <p className="mb-0">Anyone can see this Post</p>
                                                                         </div>
                                                                     </div>
-                                                                </Dropdown.Item>
+                                                                </Dropdown.Item> */}
 
                                                             </Dropdown.Menu>
                                                         </Dropdown>
@@ -437,7 +473,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                 </p>
               }>
                                 {posts.map((post, index) => {
-                                    return <Col key={index} sm={12}>
+                                    return <Col key={post._id} sm={12}>
                                         <Card className=" card-block card-stretch card-height">
                                             <Card.Body>
                                                 <div className="user-post-data">
@@ -453,7 +489,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                     <p className="mb-0 text-secondary">{timeAgo(post.createdAt)}</p>
                                                                 </div>
                                                                 <div className="card-post-toolbar">
-                                                        {post.family=== userInfo.family && <Dropdown>
+                                                        {post.family._id=== userInfo.family && <Dropdown>
                                                             <Dropdown.Toggle variant="bg-transparent">
                                                             <span className="material-symbols-outlined">
                                                                 more_horiz
@@ -470,16 +506,19 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                         </div>
                                                                     </div>
                                                                     </Dropdown.Item>
-                                                                    <Dropdown.Item className=" p-3" to="#">
-                                                                        <div className="d-flex align-items-top">
-                                                                            <i className=" ri-eye-off-line h4"></i>
-                                                                            <div className="data ms-2">
-                                                                                <h6>Make it for family only</h6>
-                                                                                <p className="mb-0">Only family can see this post.</p>
-                                                                            </div>
+                                                                    {post.visibility != 'private' &&
+                                                                    <Dropdown.Item className={`p-3`} to="#" onClick={()=>handleChangePostVisibility(post._id,"private")}>
+                                                                    <div className="d-flex align-items-top">
+                                                                        <i className=" ri-eye-off-line h4"></i>
+                                                                        <div className="data ms-2">
+                                                                            <h6>Make it for family only</h6>
+                                                                            <p className="mb-0">Currently, all friends can see this post.</p>
                                                                         </div>
-                                                                    </Dropdown.Item>
-                                                                    <Dropdown.Item className=" p-3" to="#">
+                                                                    </div>
+                                                                </Dropdown.Item>
+                                                                    }
+                                                                    
+                                                                    {/* <Dropdown.Item className=" p-3" to="#">
                                                                         <div className="d-flex align-items-top">
                                                                             <i className=" ri-eye-fill h4"></i>
                                                                             <div className="data ms-2">
@@ -487,17 +526,19 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                                 <p className="mb-0">Public for all to see</p>
                                                                             </div>
                                                                         </div>
-                                                                    </Dropdown.Item>
-
-                                                                    <Dropdown.Item className=" p-3" to="#">
+                                                                    </Dropdown.Item> */}
+                                                                    {post.visibility =="private" &&
+                                                                    
+                                                                    <Dropdown.Item className=" p-3" to="#" onClick={()=>handleChangePostVisibility(post._id,"friends")}>
                                                                         <div className="d-flex align-items-top">
                                                                             <i className=" ri-group-fill h4"></i>
                                                                             <div className="data ms-2">
                                                                                 <h6>Make it for family and freinds</h6>
-                                                                                <p className="mb-0">Family and freinds only can see this</p>
+                                                                                <p className="mb-0">Currently, this post is private to your family only</p>
                                                                             </div>
                                                                         </div>
                                                                     </Dropdown.Item>
+                                                                    }
                                                                 </Dropdown.Menu>
                                                             </Dropdown> } 
                                                         </div>

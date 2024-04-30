@@ -4,7 +4,7 @@ import PostsTimeline from './app/posts-timeline'
 const Index = () => {
     
     return (
-        <PostsTimeline id='index'></PostsTimeline>
+        <PostsTimeline key={"posts"} id='index'></PostsTimeline>
     )
 }
 

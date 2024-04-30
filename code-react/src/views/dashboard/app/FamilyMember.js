@@ -76,6 +76,11 @@ export function FamilyMember({ member, updateUser, deleteUser, family, onSetFami
         //     console.log("User deletion cancelled")
     };
 
+    const handleConfirm = () => {
+        deleteUser();  // Call the function passed as a prop
+        setShowConfirm(false);  // Update state using useState
+    };
+
     return (
             <Card>
                 <Card.Header className="d-flex justify-content-between">
@@ -92,7 +97,7 @@ export function FamilyMember({ member, updateUser, deleteUser, family, onSetFami
                             <ConfirmModal
                                 show={showConfirm}
                                 onHide={() => setShowConfirm(false)}
-                                onConfirm={handleDelete}
+                                onConfirm= {handleConfirm}
                                 message={`Are you sure you want to delete ${member.userName}?`} />
                         </div>}
 
