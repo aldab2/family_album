@@ -18,6 +18,8 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                   }).toString();
 
                 // Construct the final URL
+                console.log(`Fetching data: Page ${page }, Type: ${type}`);
+
                 const url = `${POSTS_URL}?${queryString}`;
 
                 
@@ -35,6 +37,13 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 body:data
             })
         }),
+        editPostVisibility: builder.mutation({
+            query: (data)=> ({
+                url: `${POSTS_URL}/visibility`,
+                method: 'PUT',
+                body:data
+            })
+        }),
         deletePost: builder.mutation({
             query: (data)=> ({
                 url: `${POSTS_URL}`,
@@ -46,4 +55,4 @@ export const postsApiSlice = apiSlice.injectEndpoints({
     })
 });
 
-export const { useAddPostMutation, useGetPostsQuery, useLazyGetPostsQuery, useDeletePostMutation } = postsApiSlice;
+export const { useAddPostMutation, useGetPostsQuery, useLazyGetPostsQuery, useDeletePostMutation,useEditPostVisibilityMutation } = postsApiSlice;

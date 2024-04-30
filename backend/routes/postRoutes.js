@@ -4,7 +4,8 @@ import {
     deletePost,
     getPost,
     editPost,
-    minioUploadExample
+    minioUploadExample,
+    editPostVisibility
 } from '../controllers/postController.js'
 import {
     addComment,
@@ -25,7 +26,7 @@ router.put('/', editPost);
 router.delete('/', deletePost);
 router.get('/', getPost)
 router.post('/mediaExample',upload.single('file') ,minioUploadExample);
-
+router.put("/visibility",editPostVisibility)
 router.post('/comment', addComment)
 router.put('/comment', editComment)
 router.delete('/comment', deleteComment)

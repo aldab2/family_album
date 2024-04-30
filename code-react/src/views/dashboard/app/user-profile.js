@@ -86,7 +86,7 @@ const handleFriendRequestsRefetch = () => {
                   <Col sm={12} >
                      <Tab.Content>
                         <Tab.Pane eventKey="first" >
-                        <PostsTimeline id='profile' onlyMyPosts={true} ></PostsTimeline>
+                        <PostsTimeline id='profile' key={"posts-type-only-mine"} onlyMyPosts={true} ></PostsTimeline>
                         </Tab.Pane> 
                         <Tab.Pane eventKey="second">
                            <Tab.Container id="left-tabs-example" defaultActiveKey="about1">

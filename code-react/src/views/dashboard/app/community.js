@@ -4,7 +4,7 @@ import PostsTimeline from './posts-timeline'
 const Community = () => {
     
     return (
-        <PostsTimeline id='index' type='all' ></PostsTimeline>
+        <PostsTimeline key={"posts-type-all"} id='index' type='all' ></PostsTimeline>
     )
 }
 

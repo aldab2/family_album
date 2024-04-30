@@ -10,6 +10,7 @@ import { ChangePassword } from './ChangePassword';
 import { FamilyInfo } from './FamilyInfo';
 import { FamilyMember } from './FamilyMember';
 import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 
 
@@ -44,6 +45,52 @@ const UserProfileEdit =({}) =>{
             setUserInput({ ...userInfo });
         }
     }, [userInfo]); // Remove 'userInput' from dependency array
+
+    // Assuming FamilyMember component calls this function on delete
+const handleDeleteFamilyMember = async (memberId) => {
+    try {
+        await deleteUser(memberId);
+        // Assume delete was successful and update UI optimistically
+        setFamily((currentFamily) => ({
+            ...currentFamily,
+            familyMembers: currentFamily.familyMembers.filter(m => m.id !== memberId)
+        }));
+    } catch (error) {
+        // Handle error (e.g., show a message)
+        console.error('Failed to delete family member:', error);
+    }
+}
+const handleDelete = async (userNameToDelete) => {
+    // Display a confirmation dialog to the user
+    // const isConfirmed = window.confirm(`Are you sure you want to delete the user ${userNameToDelete}?`);
+    // Proceed only if the user confirmed the action
+    // if (isConfirmed) {
+    // console.log("The user to delete is:", userNameToDelete);
+    try {
+        await deleteUser({ userName: userNameToDelete }).unwrap();
+        toast.success("Family member deleted successfully");
+        // onSetFamily((family) => ({
+        //     ...family,
+        //     familyMembers: family.familyMembers.filter((member) => member.userName !== userNameToDelete)
+        //   }));
+        setFamily((currentFamily) => ({
+            ...currentFamily,
+            familyMembers: currentFamily.familyMembers.filter(m => m.userName !== userNameToDelete)
+        }));
+
+    } catch (error) {
+        console.log(error)
+        toast.error(`Failed to delete family member: ${error.data?.message || 'An error occurred'}`);
+    } finally {
+        
+        //setShowConfirm(false); // Ensure the modal is closed after operation
+    }
+
+    //else {
+    //     // User clicked 'Cancel', do not proceed with deletion
+    //     console.log("User deletion cancelled")
+};
+
     
     useEffect(() => {
         if (familyQueryResult) {
@@ -100,7 +147,7 @@ const UserProfileEdit =({}) =>{
                         <Tab.Pane eventKey="third" className="fade show">
                         <FamilyInfo family= {family} onSetFamily = {setFamily} editFamilyProfile={editFamilyProfile} addFamilyMember ={addFamilyMember} viewOnly={familyId? true:false}  />
 
-                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = {deleteUser} family={family} onSetFamily={setFamily} viewOnly={familyId? true:false}/>)}
+                          {family?.familyMembers?.map((member) => <FamilyMember key={member.id} member={member} updateUser={updateUser} deleteUser = { () => handleDelete(member.userName)} family={family} onSetFamily={setFamily} viewOnly={familyId? true:false}/>)}
                         </Tab.Pane>
 
                           {/* <ManageContact />    */}
