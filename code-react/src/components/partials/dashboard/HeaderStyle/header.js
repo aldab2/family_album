@@ -92,7 +92,7 @@ const Header = () => {
               data-active="true"
               onClick={minisidebar}
             >
-              <div className="icon material-symbols-outlined iq-burger-menu">
+              <div id="main-menu" className="icon material-symbols-outlined iq-burger-menu">
                 menu
               </div>
             </Link>
@@ -106,7 +106,7 @@ const Header = () => {
                 </Link>
               </Nav.Item>
 
-              <Dropdown as="li" className="nav-item ">
+              {/* <Dropdown as="li" className="nav-item ">
                 <Dropdown.Toggle
                   href="#"
                   as={CustomToggle}
@@ -210,7 +210,7 @@ const Header = () => {
                     </Card.Body>
                   </Card>
                 </Dropdown.Menu>
-              </Dropdown>
+              </Dropdown> */}
             
               <Dropdown as="li" className="nav-item user-dropdown">
                 <Dropdown.Toggle

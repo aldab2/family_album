@@ -45,7 +45,14 @@ const newPost = asyncHandler( async (req, res) => {
     }
     const newPost = new Post(post)
     try {
-        let mdb = await newPost.save()
+        //let mdb = await newPost.save()
+        let tmpPost = await newPost.save()
+        console.log(tmpPost)
+        let mdb = await Post.findOne({_id:tmpPost._id}).populate({
+            path: 'family',
+            select: 'spaceName' // This will only populate the spaceName field from family
+          });
+        console.log(mdb)
         const fileOriginalName = file.originalname;
         const fileExtension = fileOriginalName.substring(fileOriginalName.lastIndexOf(".")+1);
         const fileName= `${getFormattedDate()}.${fileExtension}`;
