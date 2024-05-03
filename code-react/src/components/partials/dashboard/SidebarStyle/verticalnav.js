@@ -90,17 +90,6 @@ const VerticalNav = React.memo(() => {
             </Link>
         </li>
 
-        {/* Notification */}
-        <li className={`${location.pathname === '/dashboard/app/notification' ? 'active' : ''} nav-item`}>
-            <Link className="nav-link" to="/dashboard/app/notification">
-                <OverlayTrigger placement="right" overlay={<Tooltip>Notification</Tooltip>}>
-                    <span>
-                        <i className="icon material-symbols-outlined">notifications</i>
-                    </span>
-                </OverlayTrigger>
-                <span className="item-name">Notification</span>
-            </Link>
-        </li>
     </Accordion>
 </React.Fragment>
     )

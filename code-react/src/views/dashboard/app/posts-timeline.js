@@ -228,7 +228,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
             toast.success("Post Added");
             handleClose();
           } catch (error) {
-            toast.error("Failed to add post");
+            toast.error(`Failed to add post ${error}`);
           }
         } else {
           toast.info("Fields Missing");
@@ -411,7 +411,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                 <span className="btn btn-primary">{selectedPostVisibility}</span>
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu className=" m-0 p-0">
-                                                                <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('private')}>
+                                                                <Dropdown.Item className=" p-3" to="#" onClick={()=>handleSelectPostVisibility('Family Members')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-user-unfollow-line h4"></i>
                                                                         <div className="data ms-2">
@@ -420,7 +420,7 @@ const PostsTimeline = ({type = "family" , onlyMyPosts = false }) => {
                                                                         </div>
                                                                     </div>
                                                                 </Dropdown.Item>
-                                                                <Dropdown.Item className="p-3" to="#" onClick={()=>handleSelectPostVisibility('friends')}>
+                                                                <Dropdown.Item className="p-3" to="#" onClick={()=>handleSelectPostVisibility('Family Friends')}>
                                                                     <div className="d-flex align-items-top">
                                                                         <i className="ri-close-circle-line h4"></i>
                                                                         <div className="data ms-2">
